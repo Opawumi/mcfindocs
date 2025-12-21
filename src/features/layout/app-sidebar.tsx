@@ -1,0 +1,399 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { 
+  FileText, 
+  Folder, 
+  Mail, 
+  Settings, 
+  Users, 
+  LayoutDashboard,
+  ChevronRight,
+  ChevronDown,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useUIStore } from '@/stores';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+import { useState } from 'react';
+import { mockCategories } from '@/lib/mock-data';
+import type { Category } from '@/lib/types';
+import { FolderTree, CreateFolderDialog } from '@/features/folders';
+import { createFolder } from '@/services/folder.service';
+import { toast } from 'sonner';
+import { useFolderContext } from '@/contexts/folder-context';
+
+// Extended Category type with children for tree display
+interface CategoryWithChildren extends Category {
+  children?: CategoryWithChildren[];
+}
+
+// Build hierarchical tree from flat category array
+function buildCategoryTree(categories: Category[]): CategoryWithChildren[] {
+  const categoryMap = new Map<string, CategoryWithChildren>();
+  const rootCategories: CategoryWithChildren[] = [];
+
+  // First pass: create map of all categories
+  categories.forEach(cat => {
+    categoryMap.set(cat.id, { ...cat, children: [] });
+  });
+
+  // Second pass: build tree structure
+  categories.forEach(cat => {
+    const category = categoryMap.get(cat.id)!;
+    if (cat.parentId) {
+      const parent = categoryMap.get(cat.parentId);
+      if (parent) {
+        parent.children = parent.children || [];
+        parent.children.push(category);
+      }
+    } else {
+      rootCategories.push(category);
+    }
+  });
+
+  return rootCategories;
+}
+
+interface NavItem {
+  title: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  badge?: number;
+}
+
+const navItems: NavItem[] = [
+  {
+    title: 'Dashboard',
+    href: '/dashboard',
+    icon: LayoutDashboard,
+  },
+  {
+    title: 'Documents',
+    href: '/dashboard/documents',
+    icon: FileText,
+  },
+  {
+    title: 'My Folders',
+    href: '/dashboard/my-folders',
+    icon: Folder,
+  },
+  {
+    title: 'E-Memos',
+    href: '/dashboard/memos',
+    icon: Mail,
+    badge: 3,
+  },
+];
+
+const adminNavItems: NavItem[] = [
+  {
+    title: 'Users',
+    href: '/dashboard/admin/users',
+    icon: Users,
+  },
+  {
+    title: 'Settings',
+    href: '/dashboard/settings',
+    icon: Settings,
+  },
+];
+
+// Category Tree Component
+function CategoryTreeItem({ category, level = 0 }: { category: CategoryWithChildren; level?: number }) {
+  const [isExpanded, setIsExpanded] = useState(true);
+  const pathname = usePathname();
+  const router = useRouter();
+  const { selectedCategoryId, setSelectedCategoryId } = useUIStore();
+  const hasChildren = category.children && category.children.length > 0;
+  const isSelected = selectedCategoryId === category.id;
+
+  const handleClick = () => {
+    // Navigate to documents page if not already there
+    if (!pathname.startsWith('/dashboard/documents')) {
+      router.push('/dashboard/documents');
+    }
+    // Set selected category
+    setSelectedCategoryId(category.id);
+  };
+
+  return (
+    <div>
+      <button
+        onClick={handleClick}
+        className={cn(
+          'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+          level > 0 && 'pl-8 justify-self-end',
+          isSelected 
+            ? 'bg-primary text-white' 
+            : 'hover:bg-gray-100 text-gray-700'
+        )}
+      >
+        {hasChildren && (
+          <span
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsExpanded(!isExpanded);
+            }}
+            className="flex items-center cursor-pointer"
+          >
+            {isExpanded ? (
+              <ChevronDown className="h-4 w-4" />
+            ) : (
+              <ChevronRight className="h-4 w-4" />
+            )}
+          </span>
+        )}
+        {!hasChildren && <div className="w-4" />}
+        <span className="flex-1 text-left">{category.name}</span>
+        {category.documentCount && category.documentCount > 0 && (
+          <span className={cn(
+            "text-xs",
+            isSelected ? "text-white/80" : "text-gray-500"
+          )}>
+            {category.documentCount}
+          </span>
+        )}
+      </button>
+      
+      {hasChildren && isExpanded && (
+        <div className="mt-1">
+          {category.children!.map((child) => (
+            <CategoryTreeItem key={child.id} category={child} level={level + 1} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CategoryTree() {
+  const categories = buildCategoryTree(mockCategories);
+  const { selectedCategoryId, setSelectedCategoryId } = useUIStore();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleAllDocuments = () => {
+    if (!pathname.startsWith('/dashboard/documents')) {
+      router.push('/dashboard/documents');
+    }
+    setSelectedCategoryId(null);
+  };
+
+  return (
+    <div className="space-y-1">
+      <div className="px-3 py-2">
+        <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+          Categories
+        </h2>
+      </div>
+      
+      {/* All Documents Option */}
+      <button
+        onClick={handleAllDocuments}
+        className={cn(
+          'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+          selectedCategoryId === null
+            ? 'bg-primary text-white'
+            : 'hover:bg-gray-100 text-gray-700'
+        )}
+      >
+        <span className="flex-1 text-left">All Documents</span>
+      </button>
+
+      {categories.map((category) => (
+        <CategoryTreeItem key={category.id} category={category} />
+      ))}
+    </div>
+  );
+}
+
+// Main Navigation Component
+function MainNavigation() {
+  const pathname = usePathname();
+
+  return (
+    <>
+      <nav className="space-y-1">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = pathname === item.href;
+
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors relative',
+                isActive
+                  ? 'bg-primary text-white'
+                  : 'text-gray-700 hover:bg-gray-100'
+              )}
+            >
+              <Icon className="h-5 w-5 shrink-0" />
+              <span>{item.title}</span>
+              {item.badge && (
+                <span className={cn(
+                  "ml-auto flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-semibold",
+                  isActive ? "bg-white text-primary" : "bg-primary text-white"
+                )}>
+                  {item.badge}
+                </span>
+              )}
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* Admin Section */}
+      <Separator className="my-4" />
+      <p className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+        Admin
+      </p>
+
+      <nav className="space-y-1">
+        {adminNavItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                isActive
+                  ? 'bg-primary text-white'
+                  : 'text-gray-700 hover:bg-gray-100'
+              )}
+            >
+              <Icon className="h-5 w-5 shrink-0" />
+              <span>{item.title}</span>
+            </Link>
+          );
+        })}
+      </nav>
+    </>
+  );
+}
+
+export function AppSidebar() {
+  const pathname = usePathname();
+  const { isSidebarCollapsed, toggleSidebarCollapse } = useUIStore();
+  const { folders, setCurrentFolderId, setCurrentFolder, refreshFolders } = useFolderContext();
+  
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+
+  // Determine what to show in sidebar based on current route
+  const isDocumentsPage = pathname.startsWith('/dashboard/documents');
+  const isMyFoldersPage = pathname.startsWith('/dashboard/my-folders');
+
+  return (
+    <aside className={cn(
+      "fixed left-0 top-0 z-40 h-screen border-r border-gray-200 bg-white transition-all duration-300",
+      isSidebarCollapsed ? "w-18" : "w-64"
+    )}>
+      <div className="flex h-full flex-col">
+        {/* Logo */}
+        <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200">
+          {!isSidebarCollapsed && (
+            <Link href="/dashboard" className="flex items-center space-x-2">
+              <span className="text-lg font-bold text-dark">McFin Docs</span>
+            </Link>
+          )}
+          <button
+            onClick={toggleSidebarCollapse}
+            className={cn(
+              "flex h-8 w-8 items-center justify-center rounded-md hover:bg-gray-100 transition-colors",
+              isSidebarCollapsed && "mx-auto"
+            )}
+          >
+            {isSidebarCollapsed ? (
+              <ChevronRight className="h-4 w-4 text-gray-600" />
+            ) : (
+              <svg className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            )}
+          </button>
+        </div>
+
+        {/* Dynamic Content Area */}
+        {!isSidebarCollapsed && (
+          <ScrollArea className="flex-1 px-3 py-4">
+            {isDocumentsPage ? (
+              <CategoryTree />
+            ) : isMyFoldersPage ? (
+              <>
+                <FolderTree
+                  folders={folders}
+                  selectedFolderId={useUIStore.getState().selectedFolderId}
+                  onSelectFolder={(folderId) => {
+                    const selectedId = folderId || null;
+                    useUIStore.getState().setSelectedFolderId(selectedId);
+                    // Update folder context
+                    setCurrentFolderId(selectedId);
+                    if (selectedId) {
+                      const folder = folders.find(f => f.id === selectedId);
+                      setCurrentFolder(folder || null);
+                    } else {
+                      setCurrentFolder(null);
+                    }
+                  }}
+                  onCreateFolder={(parentId) => {
+                    // Sidebar button creates root folders (no parent)
+                    setCreateDialogOpen(true);
+                  }}
+                  onRenameFolder={(folderId) => {
+                    console.log('Rename folder', folderId);
+                    // TODO: Open rename folder dialog
+                  }}
+                  onDeleteFolder={(folderId) => {
+                    console.log('Delete folder', folderId);
+                    // TODO: Open delete folder dialog
+                  }}
+                />
+                <CreateFolderDialog
+                  open={createDialogOpen}
+                  onOpenChange={(open) => {
+                    setCreateDialogOpen(open);
+                  }}
+                  folders={folders}
+                  parentId={undefined} // Sidebar always creates root folders
+                  onCreate={async (name, parentId) => {
+                    try {
+                      await createFolder({ name, parentId });
+                      toast.success('Folder created successfully');
+                      // Refresh folders from shared context
+                      refreshFolders();
+                      setCreateDialogOpen(false);
+                    } catch (error) {
+                      toast.error('Failed to create folder');
+                      console.error('Error creating folder:', error);
+                    }
+                  }}
+                />
+              </>
+            ) : (
+              <MainNavigation />
+            )}
+          </ScrollArea>
+        )}
+
+        {/* Support Section */}
+        {!isSidebarCollapsed && !isDocumentsPage && !isMyFoldersPage && (
+          <div className="border-t border-gray-200 p-4">
+            <div className="rounded-lg bg-gray-50 p-3">
+              <p className="text-xs font-semibold text-gray-700 mb-1">Need support?</p>
+              <p className="text-xs text-gray-600 mb-2">Get help with document management and best practices.</p>
+              <button className="w-full rounded-md bg-primary text-white text-xs font-medium py-2 hover:bg-primary/90 transition-colors">
+                Contact support
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </aside>
+  );
+}
