@@ -1,0 +1,204 @@
+@import url("https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap");
+@import "tailwindcss";
+
+body,
+html,
+* {
+  font-family: "Figtree", "sans-serif";
+}
+
+/* ============================================
+   THEME VARIABLES
+   ============================================ */
+@theme {
+  /* Brand Colors */
+  --color-primary: #00923f;
+  --color-secondary: #cafe48;
+  --color-white: #ffffff;
+  --color-dark: #232020;
+  --color-neutral: #bfbccb;
+  --color-red: #ff0000;
+
+  /* Additional Semantic Colors */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-info: #3b82f6;
+  --color-border: #e5e7eb;
+  --color-input: #e5e7eb;
+  --color-ring: #00923f;
+
+  /* Semantic Color Mappings for Utilities */
+  --color-foreground: #232020;
+  --color-background: #ffffff;
+  --color-muted: #bfbccb;
+  --color-muted-foreground: #232020;
+  --color-card: #ffffff;
+  --color-card-foreground: #232020;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #232020;
+  --color-accent: #00923f;
+  --color-accent-foreground: #ffffff;
+  --color-destructive: #ff0000;
+  --color-destructive-foreground: #ffffff;
+
+  /* Gray Scale */
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+
+  /* Typography Scale */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+
+  /* Spacing Scale */
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --spacing-10: 2.5rem;
+  --spacing-12: 3rem;
+  --spacing-16: 4rem;
+}
+
+@layer base {
+  :root {
+    /* Semantic Color Mappings */
+    --color-foreground: var(--color-dark);
+    --color-background: var(--color-white);
+    --color-muted: var(--color-neutral);
+    --color-muted-foreground: var(--color-dark);
+    --color-accent: var(--color-primary);
+    --color-accent-foreground: var(--color-white);
+    --color-destructive: var(--color-red);
+    --color-destructive-foreground: var(--color-white);
+
+    /* Card Colors */
+    --color-card: var(--color-white);
+    --color-card-foreground: var(--color-dark);
+
+    /* Popover Colors */
+    --color-popover: var(--color-white);
+    --color-popover-foreground: var(--color-dark);
+
+    /* Sidebar Colors */
+    --color-sidebar-background: #f9fafb;
+    --color-sidebar-foreground: var(--color-dark);
+    --color-sidebar-border: var(--color-border);
+    --color-sidebar-accent: #f3f4f6;
+    --color-sidebar-accent-foreground: var(--color-dark);
+
+    /* Primary/Secondary Foreground */
+    --color-primary-foreground: var(--color-white);
+    --color-secondary-foreground: var(--color-dark);
+  }
+
+  .dark {
+    /* Dark Mode Overrides */
+    --color-foreground: var(--color-white);
+    --color-background: var(--color-dark);
+    --color-muted: #374151;
+    --color-muted-foreground: var(--color-neutral);
+    --color-border: #374151;
+    --color-input: #374151;
+
+    --color-card: var(--color-dark);
+    --color-card-foreground: var(--color-white);
+
+    --color-popover: var(--color-dark);
+    --color-popover-foreground: var(--color-white);
+
+    --color-sidebar-background: var(--color-dark);
+    --color-sidebar-foreground: var(--color-white);
+    --color-sidebar-border: #374151;
+    --color-sidebar-accent: #1f2937;
+    --color-sidebar-accent-foreground: var(--color-white);
+  }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+@layer utilities {
+  /* Glassmorphism Effect */
+  .glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(191, 188, 203, 0.3);
+  }
+
+  .dark .glass {
+    background: rgba(35, 32, 32, 0.7);
+    border: 1px solid rgba(191, 188, 203, 0.2);
+  }
+
+  .glass-strong {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(191, 188, 203, 0.3);
+  }
+
+  .dark .glass-strong {
+    background: rgba(35, 32, 32, 0.7);
+    border: 1px solid rgba(191, 188, 203, 0.2);
+  }
+
+  /* Gradient Text */
+  .gradient-text {
+    background: linear-gradient(
+      135deg,
+      var(--color-primary),
+      var(--color-secondary)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Gradient Background */
+  .gradient-bg {
+    background: linear-gradient(
+      135deg,
+      var(--color-primary),
+      var(--color-secondary)
+    );
+  }
+
+  /* Custom Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: var(--color-muted);
+    border-radius: 0.5rem;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--color-gray-400);
+    border-radius: 0.5rem;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--color-gray-500);
+  }
+}
