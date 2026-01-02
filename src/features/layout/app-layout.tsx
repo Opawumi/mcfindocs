@@ -13,7 +13,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const { isSidebarCollapsed } = useUIStore();
 
   return (
-    <div className="relative min-h-screen bg-gray-50">
+    <div className="relative min-h-screen bg-white">
       {/* Sidebar */}
       <AppSidebar />
 

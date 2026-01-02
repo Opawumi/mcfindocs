@@ -108,45 +108,19 @@ html,
     --color-primary-foreground: var(--color-white);
     --color-secondary-foreground: var(--color-dark);
   }
-
-  .dark {
-    /* Dark Mode Overrides */
-    --color-foreground: var(--color-white);
-    --color-background: var(--color-dark);
-    --color-muted: #374151;
-    --color-muted-foreground: var(--color-neutral);
-    --color-border: #374151;
-    --color-input: #374151;
-
-    --color-card: var(--color-dark);
-    --color-card-foreground: var(--color-white);
-
-    --color-popover: var(--color-dark);
-    --color-popover-foreground: var(--color-white);
-
-    --color-sidebar-background: var(--color-dark);
-    --color-sidebar-foreground: var(--color-white);
-    --color-sidebar-border: #374151;
-    --color-sidebar-accent: #1f2937;
-    --color-sidebar-accent-foreground: var(--color-white);
-  }
 }
 
 /* ============================================
    UTILITY CLASSES
    ============================================ */
 @layer utilities {
+
   /* Glassmorphism Effect */
   .glass {
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(191, 188, 203, 0.3);
-  }
-
-  .dark .glass {
-    background: rgba(35, 32, 32, 0.7);
-    border: 1px solid rgba(191, 188, 203, 0.2);
   }
 
   .glass-strong {
@@ -156,18 +130,11 @@ html,
     border: 1px solid rgba(191, 188, 203, 0.3);
   }
 
-  .dark .glass-strong {
-    background: rgba(35, 32, 32, 0.7);
-    border: 1px solid rgba(191, 188, 203, 0.2);
-  }
-
   /* Gradient Text */
   .gradient-text {
-    background: linear-gradient(
-      135deg,
-      var(--color-primary),
-      var(--color-secondary)
-    );
+    background: linear-gradient(135deg,
+        var(--color-primary),
+        var(--color-secondary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -175,11 +142,9 @@ html,
 
   /* Gradient Background */
   .gradient-bg {
-    background: linear-gradient(
-      135deg,
-      var(--color-primary),
-      var(--color-secondary)
-    );
+    background: linear-gradient(135deg,
+        var(--color-primary),
+        var(--color-secondary));
   }
 
   /* Custom Scrollbar */

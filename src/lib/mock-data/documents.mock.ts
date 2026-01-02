@@ -35,7 +35,7 @@ export const mockDocuments: Document[] = [
     fileName: "q4-2024-financial-report.xlsx",
     fileSize: 1245678,
     fileType: "xlsx",
-    fileUrl: "/mock-files/q4-2024-financial-report.xlsx",
+    fileUrl: "/19-30gr039 Report.pdf",
     categoryId: "cat-7-2",
     metadata: {
       title: "Q4 2024 Financial Report",
@@ -60,7 +60,7 @@ export const mockDocuments: Document[] = [
     fileName: "marketing-campaign-proposal.docx",
     fileSize: 856432,
     fileType: "docx",
-    fileUrl: "/mock-files/marketing-campaign-proposal.docx",
+    fileUrl: "/19-30gr039 Report.pdf",
     categoryId: "cat-3-2",
     metadata: {
       title: "Marketing Campaign Proposal - Spring 2025",
@@ -85,7 +85,7 @@ export const mockDocuments: Document[] = [
     fileName: "software-dev-contract-2024.pdf",
     fileSize: 3245678,
     fileType: "pdf",
-    fileUrl: "/mock-files/software-dev-contract-2024.pdf",
+    fileUrl: "/19-30gr039 Report.pdf",
     categoryId: "cat-8-1",
     metadata: {
       title: "Software Development Contract 2024",
@@ -109,7 +109,7 @@ export const mockDocuments: Document[] = [
     fileName: "meeting-minutes-nov-2024.pdf",
     fileSize: 456789,
     fileType: "pdf",
-    fileUrl: "/mock-files/meeting-minutes-nov-2024.pdf",
+    fileUrl: "/19-30gr039 Report.pdf",
     categoryId: "cat-3-1",
     metadata: {
       title: "Leadership Meeting Minutes - November 2024",

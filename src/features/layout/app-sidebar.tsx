@@ -2,15 +2,16 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { 
-  FileText, 
-  Folder, 
-  Mail, 
-  Settings, 
-  Users, 
+import {
+  FileText,
+  Folder,
+  Mail,
+  Settings,
+  Users,
   LayoutDashboard,
   ChevronRight,
   ChevronDown,
+  Video,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/stores';
@@ -85,6 +86,11 @@ const navItems: NavItem[] = [
     icon: Mail,
     badge: 3,
   },
+  {
+    title: 'E-Meetings',
+    href: '/dashboard/meetings',
+    icon: Video,
+  },
 ];
 
 const adminNavItems: NavItem[] = [
@@ -125,8 +131,8 @@ function CategoryTreeItem({ category, level = 0 }: { category: CategoryWithChild
         className={cn(
           'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
           level > 0 && 'pl-8 justify-self-end',
-          isSelected 
-            ? 'bg-primary text-white' 
+          isSelected
+            ? 'bg-primary text-white'
             : 'hover:bg-gray-100 text-gray-700'
         )}
       >
@@ -156,7 +162,7 @@ function CategoryTreeItem({ category, level = 0 }: { category: CategoryWithChild
           </span>
         )}
       </button>
-      
+
       {hasChildren && isExpanded && (
         <div className="mt-1">
           {category.children!.map((child) => (
@@ -188,7 +194,7 @@ function CategoryTree() {
           Categories
         </h2>
       </div>
-      
+
       {/* All Documents Option */}
       <button
         onClick={handleAllDocuments}
@@ -278,16 +284,138 @@ function MainNavigation() {
   );
 }
 
+// Memo Navigation Component
+function MemoNavigation() {
+  const pathname = usePathname();
+
+  const memoItems = [
+    {
+      title: 'Create Memo',
+      href: '/dashboard/memos/create',
+    },
+    {
+      title: 'Draft',
+      href: '/dashboard/memos/draft',
+    },
+    {
+      title: 'Inbox',
+      href: '/dashboard/memos/inbox',
+    },
+    {
+      title: 'Sent',
+      href: '/dashboard/memos/sent',
+    },
+    {
+      title: 'Archive',
+      href: '/dashboard/memos/archive',
+    },
+    {
+      title: 'Tracking',
+      href: '/dashboard/memos/tracking',
+    },
+  ];
+
+  return (
+    <>
+      <div className="px-3 py-2 border-b border-gray-200">
+        <div className="flex items-center gap-2">
+          <Mail className="h-5 w-5 text-gray-600" />
+          <h2 className="text-sm font-semibold text-gray-700">Memo</h2>
+        </div>
+      </div>
+
+      <nav className="space-y-1 mt-2">
+        {memoItems.map((item) => {
+          const isActive = pathname === item.href;
+
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                'block px-4 py-2 text-sm font-medium transition-colors rounded-lg mx-2',
+                isActive
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+              )}
+            >
+              {item.title}
+            </Link>
+          );
+        })}
+      </nav>
+    </>
+  );
+}
+
+// Meeting Navigation Component
+function MeetingNavigation() {
+  const pathname = usePathname();
+
+  const meetingItems = [
+    {
+      title: 'Meetings',
+      href: '/dashboard/meetings',
+    },
+    {
+      title: 'E-Senate Meeting List',
+      href: '/dashboard/meetings/list',
+    },
+    {
+      title: 'Vote Management',
+      href: '/dashboard/meetings/vote-management',
+    },
+    {
+      title: 'Give Vote',
+      href: '/dashboard/meetings/give-vote',
+    },
+  ];
+
+  return (
+    <>
+      <div className="px-3 py-2 border-b border-gray-200">
+        <div className="flex items-center gap-2">
+          <Video className="h-5 w-5 text-gray-600" />
+          <h2 className="text-sm font-semibold text-gray-700">Meetings</h2>
+        </div>
+      </div>
+
+      <nav className="space-y-1 mt-2">
+        {meetingItems.map((item) => {
+          const isActive = pathname === item.href;
+
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                'block px-4 py-2 text-sm font-medium transition-colors rounded-lg mx-2',
+                isActive
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+              )}
+            >
+              {item.title}
+            </Link>
+          );
+        })}
+      </nav>
+    </>
+  );
+}
+
 export function AppSidebar() {
   const pathname = usePathname();
   const { isSidebarCollapsed, toggleSidebarCollapse } = useUIStore();
   const { folders, setCurrentFolderId, setCurrentFolder, refreshFolders } = useFolderContext();
-  
+
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   // Determine what to show in sidebar based on current route
   const isDocumentsPage = pathname.startsWith('/dashboard/documents');
   const isMyFoldersPage = pathname.startsWith('/dashboard/my-folders');
+  const isMemosPage = pathname.startsWith('/dashboard/memos');
+  const isMeetingsPage = pathname.startsWith('/dashboard/meetings');
 
   return (
     <aside className={cn(
@@ -375,6 +503,10 @@ export function AppSidebar() {
                   }}
                 />
               </>
+            ) : isMemosPage ? (
+              <MemoNavigation />
+            ) : isMeetingsPage ? (
+              <MeetingNavigation />
             ) : (
               <MainNavigation />
             )}
@@ -382,7 +514,7 @@ export function AppSidebar() {
         )}
 
         {/* Support Section */}
-        {!isSidebarCollapsed && !isDocumentsPage && !isMyFoldersPage && (
+        {!isSidebarCollapsed && !isDocumentsPage && !isMyFoldersPage && !isMemosPage && !isMeetingsPage && (
           <div className="border-t border-gray-200 p-4">
             <div className="rounded-lg bg-gray-50 p-3">
               <p className="text-xs font-semibold text-gray-700 mb-1">Need support?</p>
