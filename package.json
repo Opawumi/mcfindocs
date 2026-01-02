@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "copy-pdf-worker": "node -e \"require('fs').copyFileSync('node_modules/react-pdf/node_modules/pdfjs-dist/build/pdf.worker.min.mjs', 'public/pdf.worker.min.mjs')\"",
-    "dev": "npm run copy-pdf-worker && next dev --webpack",
+    "dev": "npm run copy-pdf-worker && next dev --turbo",
     "build": "npm run copy-pdf-worker && next build",
     "start": "next start",
     "lint": "eslint"
@@ -24,6 +24,7 @@
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-separator": "^1.1.8",
     "@radix-ui/react-slot": "^1.2.4",
+    "@radix-ui/react-switch": "^1.2.6",
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@react-pdf/renderer": "^4.3.1",
