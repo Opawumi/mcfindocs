@@ -313,6 +313,10 @@ function MemoNavigation() {
       title: 'Tracking',
       href: '/dashboard/memos/tracking',
     },
+    {
+      title: 'Department Activity',
+      href: '/dashboard/memos/department',
+    },
   ];
 
   return (

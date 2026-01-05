@@ -17,9 +17,14 @@
 
 ### 📧 E-Memos Module
 A comprehensive system for internal communication and tracking.
-*   **Inbox/Sent/Drafts:** Fully structured text-based interfaces for managing correspondence.
-*   **Compose Interface:** Detailed form for creating memos with fields for Recipients (To/CC), Subject, Side Notes, Approvers, and Rich Text content.
-*   **Tracking & Archives:** Dedicated views for monitoring memo status and accessing historical records.
+*   **Inbox/Sent/Drafts:** Structured interfaces for managing correspondence.
+*   **UNILORIN Feedback Integration:** 
+    *   **Enhanced Structure:** Each memo now explicitly captures the **Initiator's Office/Department** and **Designation** for full traceability.
+    *   **Dynamic Status Stepper:** Real-time visualization of the memo lifecycle (`Initiated` -> `Pending` -> `Reviewed` -> `Approved`).
+    *   **Supervisor Dashboard:** A "Department Activity" hub enabling HODs/Top Officials to monitor all departmental communications and read/unread statuses.
+    *   **Financial Security:** Prototyped a "Secured PDF" generation feature for financial approvals (VC/Bursar compliance).
+*   **Compose Interface:** Advanced form with CC fields, Subject, Recommenders, Approvers, and a **Financial Approval** toggle.
+*   **Tracking & Archives:** Dedicated views for monitoring engagement and historical records.
 
 ### 🎥 E-Meetings Module
 A central hub for virtual collaboration.

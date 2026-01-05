@@ -9,7 +9,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { ArrowLeft, Send, Save } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { ArrowLeft, Send, Save, CreditCard } from 'lucide-react';
 
 interface MemoFormData {
     to: string[];
@@ -19,6 +20,7 @@ interface MemoFormData {
     recommender: string;
     approver: string;
     message: string;
+    isFinancial: boolean;
 }
 
 export function ComposeMemo() {
@@ -31,6 +33,7 @@ export function ComposeMemo() {
         recommender: '',
         approver: '',
         message: '',
+        isFinancial: false,
     });
 
     const [selectedTo, setSelectedTo] = useState('');
@@ -45,6 +48,8 @@ export function ComposeMemo() {
     ];
 
     const currentUserEmail = 'divandsection@gmail.com'; // Mock current user
+    const currentUserDept = 'Information Technology'; // Mock
+    const currentUserDesignation = 'Systems Administrator'; // Mock
 
     const handleSaveDraft = async () => {
         // TODO: Implement save draft API call
@@ -90,14 +95,51 @@ export function ComposeMemo() {
 
             <Card className="p-6 bg-white shadow-sm border border-gray-200">
                 <form className="space-y-6">
-                    {/* From (Read-only) */}
-                    <div className="space-y-2">
-                        <Label htmlFor="from" className="text-gray-900">From</Label>
-                        <Input
-                            id="from"
-                            value={currentUserEmail}
-                            disabled
-                            className="bg-white border-gray-200 disabled:opacity-100 disabled:cursor-default text-gray-900"
+                    {/* From Section */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="from" className="text-gray-900">From</Label>
+                            <Input
+                                id="from"
+                                value={currentUserEmail}
+                                disabled
+                                className="bg-white border-gray-200 disabled:opacity-100 disabled:cursor-default text-gray-900"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="dept" className="text-gray-900">Department</Label>
+                            <Input
+                                id="dept"
+                                value={currentUserDept}
+                                disabled
+                                className="bg-white border-gray-200 disabled:opacity-100 disabled:cursor-default text-gray-900"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="designation" className="text-gray-900">Designation</Label>
+                            <Input
+                                id="designation"
+                                value={currentUserDesignation}
+                                disabled
+                                className="bg-white border-gray-200 disabled:opacity-100 disabled:cursor-default text-gray-900"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Financial Approval Toggle */}
+                    <div className="flex items-center justify-between p-4 bg-primary/5 rounded-lg border border-primary/10">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-primary/10 rounded-full">
+                                <CreditCard className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                                <p className="text-sm font-medium text-gray-900">Financial Approval</p>
+                                <p className="text-xs text-gray-500">Enable this if the memo requires financial authorization</p>
+                            </div>
+                        </div>
+                        <Switch
+                            checked={formData.isFinancial}
+                            onCheckedChange={(checked) => setFormData({ ...formData, isFinancial: checked })}
                         />
                     </div>
 

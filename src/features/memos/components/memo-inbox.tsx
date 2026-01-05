@@ -16,7 +16,7 @@ interface Memo {
     subject: string;
     preview: string;
     date: string;
-    status: 'approved' | 'pending';
+    status: 'initiated' | 'pending' | 'reviewed' | 'approved';
     isRead: boolean;
 }
 
@@ -24,15 +24,34 @@ interface Memo {
 const mockMemos: Memo[] = [
     {
         id: '1',
-        from: 'divandsection@gmail.com',
-        to: 'divandsection@gmail.com',
-        subject: 'Testing on demo Memo for Senate',
-        preview:
-            'We would like to inform you that there will be a scheduled syste...',
-        date: 'Aug 23',
-        status: 'approved',
+        from: 'sarah.connor@unilorin.edu.ng',
+        to: 'Registrar',
+        subject: 'Research Grant Application',
+        preview: 'This memorandum is to formally request approval for...',
+        date: 'Jan 04',
+        status: 'pending',
         isRead: false,
     },
+    {
+        id: '2',
+        from: 'john.smith@unilorin.edu.ng',
+        to: 'VC',
+        subject: 'Senate Minutes Approval',
+        preview: 'Please find attached the minutes for the 254th senate...',
+        date: 'Jan 03',
+        status: 'approved',
+        isRead: true,
+    },
+    {
+        id: '3',
+        from: 'jessica.davis@unilorin.edu.ng',
+        to: 'HOD IT',
+        subject: 'New Curriculum Proposal',
+        preview: 'Proposed changes to the undergraduate computer science...',
+        date: 'Jan 02',
+        status: 'reviewed',
+        isRead: true,
+    }
 ];
 
 export function MemoInbox() {
@@ -41,8 +60,8 @@ export function MemoInbox() {
     const [selectedMemos, setSelectedMemos] = useState<string[]>([]);
     const [activeTab, setActiveTab] = useState<'approved' | 'pending'>('approved');
 
-    const approvedMemos = mockMemos.filter((memo) => memo.status === 'approved');
-    const pendingMemos = mockMemos.filter((memo) => memo.status === 'pending');
+    const approvedMemos = mockMemos.filter((memo) => ['approved', 'reviewed'].includes(memo.status));
+    const pendingMemos = mockMemos.filter((memo) => ['pending', 'initiated'].includes(memo.status));
 
     const displayedMemos = activeTab === 'approved' ? approvedMemos : pendingMemos;
     const filteredMemos = displayedMemos.filter(

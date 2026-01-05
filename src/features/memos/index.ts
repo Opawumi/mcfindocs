@@ -5,3 +5,5 @@ export * from './components/memo-draft';
 export * from './components/memo-sent';
 export * from './components/memo-archive';
 export * from './components/memo-tracking';
+export * from './components/memo-detail';
+export * from './components/department-memos';
