@@ -257,37 +257,35 @@ function MainNavigation() {
       </nav>
 
       {/* Admin Section */}
-      {isAdmin && (
-        <>
-          <Separator className="my-4" />
-          <p className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
-            Admin
-          </p>
+      <>
+        <Separator className="my-4" />
+        <p className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+          Admin
+        </p>
 
-          <nav className="space-y-1">
-            {adminNavItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+        <nav className="space-y-1">
+          {adminNavItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
 
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
-                    isActive
-                      ? 'bg-primary text-white'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  )}
-                >
-                  <Icon className="h-5 w-5 shrink-0" />
-                  <span>{item.title}</span>
-                </Link>
-              );
-            })}
-          </nav>
-        </>
-      )}
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                  isActive
+                    ? 'bg-primary text-white'
+                    : 'text-gray-700 hover:bg-gray-100'
+                )}
+              >
+                <Icon className="h-5 w-5 shrink-0" />
+                <span>{item.title}</span>
+              </Link>
+            );
+          })}
+        </nav>
+      </>
     </>
   );
 }

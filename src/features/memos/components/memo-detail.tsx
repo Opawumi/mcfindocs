@@ -600,7 +600,7 @@ export function MemoDetail({ memo: initialMemo }: any) {
                     </CardHeader>
                     <CardContent className="p-4 sm:p-8">
                         <div
-                            className="prose prose-sm max-w-none text-gray-700 leading-relaxed min-h-[200px] sm:min-h-[300px]"
+                            className="prose prose-sm max-w-none text-gray-700 leading-relaxed min-h-[200px] sm:min-h-[300px] w-full break-words [&>p]:break-words [&>span]:break-words"
                             dangerouslySetInnerHTML={{ __html: memo.message }}
                         />
 

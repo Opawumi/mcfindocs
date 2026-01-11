@@ -60,9 +60,9 @@ export function AppHeader() {
     <header className="sticky top-0 z-30 flex h-16 items-center gap-2 md:gap-4 border-b border-gray-200 bg-white px-4 md:px-6">
       {/* Mobile Menu Toggle */}
       <Button
-        variant="ghost"
+        variant="default"
         size="icon"
-        className="lg:hidden h-9 w-9"
+        className="lg:hidden h-9 w-9 bg-primary text-white hover:bg-primary/90"
         onClick={toggleSidebar}
       >
         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

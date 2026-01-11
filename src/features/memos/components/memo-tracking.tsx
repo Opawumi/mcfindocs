@@ -8,6 +8,14 @@ import { Search, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useSession } from 'next-auth/react';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 
 interface Memo {
     _id: string;
@@ -16,51 +24,6 @@ interface Memo {
     subject: string;
     status: 'initiated' | 'pending' | 'reviewed' | 'approved';
     date: string;
-}
-
-function TrackingMemoItem({ memo, onClick }: { memo: Memo, onClick: () => void }) {
-    const statusSteps = {
-        initiated: 1,
-        pending: 2,
-        reviewed: 3,
-        approved: 4
-    };
-
-    const currentStep = statusSteps[memo.status];
-
-    return (
-        <div
-            className="flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-lg hover:border-primary/50 hover:shadow-md cursor-pointer transition-all duration-200 group"
-            onClick={onClick}
-        >
-            <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-semibold text-gray-900 truncate">
-                        {memo.subject}
-                    </p>
-                    <span className="text-[10px] text-gray-400 font-medium whitespace-nowrap uppercase">
-                        {memo.date}
-                    </span>
-                </div>
-                <div className="mt-3 flex items-center gap-2">
-                    <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden flex">
-                        {[1, 2, 3, 4].map((step) => (
-                            <div
-                                key={step}
-                                className={cn(
-                                    "flex-1 h-full border-r border-white last:border-0",
-                                    step <= currentStep ? "bg-primary" : "bg-gray-200"
-                                )}
-                            />
-                        ))}
-                    </div>
-                    <span className="text-[10px] font-bold text-primary uppercase tracking-wider">
-                        {memo.status}
-                    </span>
-                </div>
-            </div>
-        </div>
-    );
 }
 
 export function MemoTracking() {
@@ -105,6 +68,21 @@ export function MemoTracking() {
     const endItem = filteredMemos.length;
     const totalItems = filteredMemos.length;
 
+    // Helper to generate a display reference number
+    const getReferenceNo = (memo: Memo) => {
+        // Mocking a reference number based on date and ID
+        const datePart = memo.date.replace(/\//g, '');
+        const idPart = memo._id.substring(memo._id.length - 2); // Last 2 chars
+        // Using MCFINDOCS prefix
+        return `MCFINDOCS/Ref/${datePart}/${idPart}`;
+    };
+
+    // Helper for status display
+    const getStatusDisplay = (status: string) => {
+        if (status === 'approved') return 'Closed';
+        return 'Open';
+    };
+
     if (loading) {
         return <div className="p-8 text-center text-gray-500">Loading tracking information...</div>;
     }
@@ -114,18 +92,31 @@ export function MemoTracking() {
             {/* Header */}
             <div className="flex items-center gap-4">
                 <Button
-                    variant="ghost"
+                    variant="default"
                     size="icon"
                     onClick={() => router.push('/dashboard')}
-                    className="h-8 w-8"
+                    className="h-8 w-8 bg-primary text-white hover:bg-primary/90"
                 >
-                    <ArrowLeft className="h-4 w-4 text-gray-900" />
+                    <ArrowLeft className="h-4 w-4" />
                 </Button>
                 <h1 className="text-2xl font-bold text-foreground">Memo Tracking</h1>
             </div>
 
-            {/* Create Memo Button */}
-            <div>
+            {/* Controls Row */}
+            <div className="flex justify-between items-center gap-4">
+                <div className="flex gap-2 flex-1 max-w-md">
+                    <div className="relative flex-1">
+                        <Input
+                            placeholder="Search"
+                            value={searchQuery}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                            className="pr-10 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400"
+                        />
+                        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            <Search className="h-4 w-4 text-gray-400" />
+                        </div>
+                    </div>
+                </div>
                 <Button
                     onClick={() => router.push('/dashboard/memos/create')}
                     className="bg-primary hover:bg-primary/90"
@@ -134,40 +125,62 @@ export function MemoTracking() {
                 </Button>
             </div>
 
-            {/* Search Bar */}
-            <div className="flex gap-2">
-                <div className="relative flex-1 max-w-xs">
-                    <Input
-                        placeholder="Search"
-                        value={searchQuery}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-                        className="pr-10 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400"
-                    />
-                </div>
-                <Button
-                    size="icon"
-                    className="bg-primary hover:bg-primary/90"
-                >
-                    <Search className="h-4 w-4" />
-                </Button>
+            {/* Table */}
+            <div className="rounded-md border bg-white">
+                <Table>
+                    <TableHeader>
+                        <TableRow className="bg-gray-50/50">
+                            <TableHead className="w-[200px] font-semibold">Reference No</TableHead>
+                            <TableHead className="font-semibold">Subject</TableHead>
+                            <TableHead className="w-[100px] font-semibold">Status</TableHead>
+                            <TableHead className="w-[120px] font-semibold">Memo Date</TableHead>
+                            <TableHead className="font-semibold">From</TableHead>
+                            <TableHead className="font-semibold">To</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {filteredMemos.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={6} className="h-24 text-center">
+                                    No tracking information available
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            filteredMemos.map((memo: Memo) => (
+                                <TableRow
+                                    key={memo._id}
+                                    className="cursor-pointer hover:bg-gray-50"
+                                    onClick={() => router.push(`/dashboard/memos/inbox/${memo._id}`)}
+                                >
+                                    <TableCell className="font-medium text-gray-600">
+                                        {getReferenceNo(memo)}
+                                    </TableCell>
+                                    <TableCell className="max-w-[300px]">
+                                        <div className="font-medium text-gray-900 truncate" title={memo.subject}>
+                                            {memo.subject}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <span className={cn(
+                                            "font-medium",
+                                            getStatusDisplay(memo.status) === 'Closed' ? "text-green-600" : "text-gray-600"
+                                        )}>
+                                            {getStatusDisplay(memo.status)}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell className="text-gray-600">{memo.date}</TableCell>
+                                    <TableCell className="text-gray-600 truncate max-w-[200px]" title={memo.from}>
+                                        {memo.from}
+                                    </TableCell>
+                                    <TableCell className="text-gray-600 truncate max-w-[200px]" title={memo.to.join(', ')}>
+                                        {memo.to.join(', ')}
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        )}
+                    </TableBody>
+                </Table>
             </div>
-
-            {/* List */}
-            {filteredMemos.length === 0 ? (
-                <div className="bg-white border border-gray-200 rounded-lg p-12 shadow-sm text-center text-gray-500">
-                    No tracking information available
-                </div>
-            ) : (
-                <div className="space-y-3">
-                    {filteredMemos.map((memo: Memo) => (
-                        <TrackingMemoItem
-                            key={memo._id}
-                            memo={memo}
-                            onClick={() => router.push(`/dashboard/memos/inbox/${memo._id}`)}
-                        />
-                    ))}
-                </div>
-            )}
 
             {/* Pagination */}
             <div className="flex items-center justify-end gap-4 text-sm text-muted-foreground">
