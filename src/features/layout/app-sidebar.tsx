@@ -12,9 +12,11 @@ import {
   ChevronRight,
   ChevronDown,
   Video,
+  LogOut,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/stores';
+import { useSession, signOut } from 'next-auth/react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useState } from 'react';
@@ -218,6 +220,8 @@ function CategoryTree() {
 // Main Navigation Component
 function MainNavigation() {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const isAdmin = (session?.user as any)?.role === 'admin';
 
   return (
     <>
@@ -253,33 +257,37 @@ function MainNavigation() {
       </nav>
 
       {/* Admin Section */}
-      <Separator className="my-4" />
-      <p className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
-        Admin
-      </p>
+      {isAdmin && (
+        <>
+          <Separator className="my-4" />
+          <p className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+            Admin
+          </p>
 
-      <nav className="space-y-1">
-        {adminNavItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+          <nav className="space-y-1">
+            {adminNavItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
-                isActive
-                  ? 'bg-primary text-white'
-                  : 'text-gray-700 hover:bg-gray-100'
-              )}
-            >
-              <Icon className="h-5 w-5 shrink-0" />
-              <span>{item.title}</span>
-            </Link>
-          );
-        })}
-      </nav>
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                    isActive
+                      ? 'bg-primary text-white'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  )}
+                >
+                  <Icon className="h-5 w-5 shrink-0" />
+                  <span>{item.title}</span>
+                </Link>
+              );
+            })}
+          </nav>
+        </>
+      )}
     </>
   );
 }
@@ -410,7 +418,7 @@ function MeetingNavigation() {
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const { isSidebarCollapsed, toggleSidebarCollapse } = useUIStore();
+  const { isSidebarCollapsed, toggleSidebarCollapse, isSidebarOpen } = useUIStore();
   const { folders, setCurrentFolderId, setCurrentFolder, refreshFolders } = useFolderContext();
 
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -424,7 +432,10 @@ export function AppSidebar() {
   return (
     <aside className={cn(
       "fixed left-0 top-0 z-40 h-screen border-r border-gray-200 bg-white transition-all duration-300",
-      isSidebarCollapsed ? "w-18" : "w-64"
+      // Desktop widths
+      isSidebarCollapsed ? "lg:w-20" : "lg:w-64",
+      // Mobile handling
+      isSidebarOpen ? "translate-x-0 w-64 shadow-2xl" : "-translate-x-full lg:translate-x-0"
     )}>
       <div className="flex h-full flex-col">
         {/* Logo */}
@@ -517,16 +528,26 @@ export function AppSidebar() {
           </ScrollArea>
         )}
 
-        {/* Support Section */}
-        {!isSidebarCollapsed && !isDocumentsPage && !isMyFoldersPage && !isMemosPage && !isMeetingsPage && (
-          <div className="border-t border-gray-200 p-4">
-            <div className="rounded-lg bg-gray-50 p-3">
-              <p className="text-xs font-semibold text-gray-700 mb-1">Need support?</p>
-              <p className="text-xs text-gray-600 mb-2">Get help with document management and best practices.</p>
-              <button className="w-full rounded-md bg-primary text-white text-xs font-medium py-2 hover:bg-primary/90 transition-colors">
-                Contact support
-              </button>
-            </div>
+        {/* Footer Section: Support & Logout */}
+        {!isSidebarCollapsed && (
+          <div className="border-t border-gray-200 p-4 space-y-2">
+            {!isDocumentsPage && !isMyFoldersPage && !isMemosPage && !isMeetingsPage && (
+              <div className="rounded-lg bg-gray-50 p-3 mb-2">
+                <p className="text-xs font-semibold text-gray-700 mb-1">Need support?</p>
+                <p className="text-xs text-gray-600 mb-2">Get help with document management.</p>
+                <button className="w-full rounded-md bg-primary text-white text-xs font-medium py-2 hover:bg-primary/90 transition-colors">
+                  Contact support
+                </button>
+              </div>
+            )}
+
+            <button
+              onClick={() => signOut({ callbackUrl: '/login' })}
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+            >
+              <LogOut className="h-5 w-5 shrink-0" />
+              <span>Log Out</span>
+            </button>
           </div>
         )}
       </div>

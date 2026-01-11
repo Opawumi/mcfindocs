@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Notification } from "../lib/types";
+import { Notification as AppNotification } from "../lib/types";
 
 interface UIState {
   // Sidebar
@@ -10,7 +10,7 @@ interface UIState {
   theme: "light" | "dark" | "system";
 
   // Notifications
-  notifications: Notification[];
+  notifications: AppNotification[];
   unreadNotificationsCount: number;
 
   // Modals
@@ -34,7 +34,7 @@ interface UIState {
 
   setTheme: (theme: "light" | "dark" | "system") => void;
 
-  addNotification: (notification: Notification) => void;
+  addNotification: (notification: AppNotification) => void;
   markNotificationAsRead: (id: string) => void;
   clearNotification: (id: string) => void;
   clearAllNotifications: () => void;
@@ -114,6 +114,23 @@ export const useUIStore = create<UIState>((set, get) => ({
       notifications: [notification, ...state.notifications],
       unreadNotificationsCount: state.unreadNotificationsCount + 1,
     }));
+
+    // Trigger Browser Notification
+    if (typeof window !== "undefined" && "Notification" in window) {
+      if (Notification.permission === "granted") {
+        new Notification(notification.title, {
+          body: notification.message,
+        });
+      } else if (Notification.permission !== "denied") {
+        Notification.requestPermission().then((permission) => {
+          if (permission === "granted") {
+            new Notification(notification.title, {
+              body: notification.message,
+            });
+          }
+        });
+      }
+    }
   },
 
   markNotificationAsRead: (id) => {
@@ -145,6 +162,10 @@ export const useUIStore = create<UIState>((set, get) => ({
   // Modal actions
   openModal: (modalId, data) => {
     set({ activeModal: modalId, modalData: data });
+  },
+
+  onCloseModal: () => {
+    set({ activeModal: null, modalData: null });
   },
 
   closeModal: () => {

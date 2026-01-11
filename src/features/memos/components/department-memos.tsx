@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,48 +20,78 @@ import {
     Filter,
     FileText,
     Eye,
-    TrendingUp
+    TrendingUp,
+    Trash2
 } from 'lucide-react';
+import { toast } from 'sonner';
+import { useSession } from 'next-auth/react';
 
-// Mock data for departmental memos
-const mockDeptMemos = [
-    {
-        id: '1',
-        initiator: 'Dr. Sarah Connor',
-        subject: 'Research Grant Application',
-        dept: 'Information Technology',
-        status: 'pending',
-        date: '2026-01-04',
-        isRead: true,
-    },
-    {
-        id: '2',
-        initiator: 'Prof. John Smith',
-        subject: 'New Curriculum Proposal',
-        dept: 'Information Technology',
-        status: 'reviewed',
-        date: '2026-01-03',
-        isRead: false,
-    },
-    {
-        id: '3',
-        initiator: 'Jessica Davis',
-        subject: 'Hardware Upgrade Request',
-        dept: 'Information Technology',
-        status: 'approved',
-        date: '2025-12-28',
-        isRead: true,
-    },
-];
+interface Memo {
+    _id: string;
+    fromName: string;
+    subject: string;
+    fromDept: string;
+    status: 'initiated' | 'pending' | 'reviewed' | 'approved';
+    date: string;
+    isRead: boolean;
+}
 
 export function DepartmentMemos() {
     const router = useRouter();
+    const [memos, setMemos] = useState<Memo[]>([]);
+    const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
 
-    const filteredMemos = mockDeptMemos.filter(memo =>
+    const { data: session } = useSession();
+    const targetDept = (session?.user as any)?.department;
+
+    useEffect(() => {
+        if (!targetDept) return;
+        const fetchMemos = async () => {
+            try {
+                const res = await fetch('/api/memos');
+                const result = await res.json();
+                if (result.success) {
+                    const deptMemos = result.data.filter((m: Memo) => m.fromDept === targetDept);
+                    setMemos(deptMemos);
+                }
+            } catch (error) {
+                toast.error('Failed to load department memos');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchMemos();
+    }, [targetDept]);
+
+    const filteredMemos = memos.filter(memo =>
         memo.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        memo.initiator.toLowerCase().includes(searchQuery.toLowerCase())
+        memo.fromName.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+    const stats = {
+        total: memos.length,
+        pending: memos.filter(m => m.status === 'pending').length,
+        unread: memos.filter(m => !m.isRead).length
+    };
+
+    const handleDeleteIndividual = async (memoId: string) => {
+        if (!window.confirm('Are you sure you want to delete this memo?')) return;
+
+        try {
+            const res = await fetch(`/api/memos/${memoId}`, {
+                method: 'DELETE'
+            });
+            if (res.ok) {
+                setMemos(prev => prev.filter(m => m._id !== memoId));
+                toast.success('Memo deleted successfully');
+            } else {
+                toast.error('Failed to delete memo');
+            }
+        } catch (error) {
+            toast.error('An error occurred');
+        }
+    };
 
     const getStatusBadge = (status: string) => {
         switch (status) {
@@ -77,86 +107,86 @@ export function DepartmentMemos() {
     return (
         <div className="space-y-6 pb-12">
             {/* Header */}
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
                     <Button
                         variant="ghost"
                         size="icon"
                         onClick={() => router.push('/dashboard')}
-                        className="h-8 w-8"
+                        className="h-8 w-8 shrink-0"
                     >
                         <ArrowLeft className="h-4 w-4" />
                     </Button>
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Department Activity</h1>
-                        <p className="text-sm text-gray-500">Monitoring all internal memos within Information Technology</p>
+                        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">Department Activity</h1>
+                        <p className="text-[10px] sm:text-sm text-gray-500 line-clamp-1">Monitoring memos in {targetDept || 'your department'}</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" className="gap-2 border-gray-200 text-gray-700">
-                        <TrendingUp className="h-4 w-4" />
+                    <Button variant="outline" size="sm" className="gap-2 border-gray-200 text-gray-700 w-full sm:w-auto text-xs h-9">
+                        <TrendingUp className="h-3.5 w-3.5" />
                         Analytics
                     </Button>
                 </div>
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="p-4 bg-white border-gray-200">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 font-bold">
+                <Card className="p-3 sm:p-4 bg-white border-gray-200 shadow-sm">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-xs font-semibold text-gray-400 uppercase">Total Memos</p>
-                            <p className="text-2xl font-bold text-gray-900">124</p>
+                            <p className="text-[9px] sm:text-xs font-bold text-gray-400 uppercase tracking-tighter sm:tracking-normal">Total Memos</p>
+                            <p className="text-lg sm:text-2xl font-bold text-gray-900">{stats.total}</p>
                         </div>
-                        <div className="p-2 bg-primary/10 rounded-lg">
-                            <FileText className="h-5 w-5 text-primary" />
+                        <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg">
+                            <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                         </div>
                     </div>
                 </Card>
-                <Card className="p-4 bg-white border-gray-200">
+                <Card className="p-3 sm:p-4 bg-white border-gray-200 shadow-sm">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-xs font-semibold text-gray-400 uppercase">Pending Review</p>
-                            <p className="text-2xl font-bold text-gray-900">8</p>
+                            <p className="text-[9px] sm:text-xs font-bold text-gray-400 uppercase tracking-tighter sm:tracking-normal">Pending Review</p>
+                            <p className="text-lg sm:text-2xl font-bold text-gray-900">{stats.pending}</p>
                         </div>
-                        <div className="p-2 bg-yellow-100 rounded-lg">
-                            <Clock className="h-5 w-5 text-yellow-600" />
+                        <div className="p-1.5 sm:p-2 bg-yellow-100 rounded-lg">
+                            <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600" />
                         </div>
                     </div>
                 </Card>
-                <Card className="p-4 bg-white border-gray-200">
+                <Card className="p-3 sm:p-4 bg-white border-gray-200 shadow-sm col-span-2 lg:col-span-1">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-xs font-semibold text-gray-400 uppercase">Unread Memos</p>
-                            <p className="text-2xl font-bold text-gray-900">3</p>
+                            <p className="text-[9px] sm:text-xs font-bold text-gray-400 uppercase tracking-tighter sm:tracking-normal">Unread Memos</p>
+                            <p className="text-lg sm:text-2xl font-bold text-gray-900">{stats.unread}</p>
                         </div>
-                        <div className="p-2 bg-red-100 rounded-lg">
-                            <Eye className="h-5 w-5 text-red-600" />
+                        <div className="p-1.5 sm:p-2 bg-red-100 rounded-lg">
+                            <Eye className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
                         </div>
                     </div>
                 </Card>
             </div>
 
             {/* Filters & Search */}
-            <div className="flex items-center gap-4 bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-                <div className="relative flex-1 max-w-sm">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-white p-3 sm:p-4 rounded-lg border border-gray-200 shadow-sm">
+                <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
                         placeholder="Search initiator or subject..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-9 bg-white border-gray-200 text-gray-900"
+                        className="pl-9 bg-white border-gray-200 text-gray-900 text-sm h-10 w-full"
                     />
                 </div>
-                <Button variant="outline" className="gap-2 border-gray-200 text-gray-700">
-                    <Filter className="h-4 w-4" />
+                <Button variant="outline" className="gap-2 border-gray-200 text-gray-700 h-10 text-xs px-4">
+                    <Filter className="h-3.5 w-3.5" />
                     Filter
                 </Button>
             </div>
 
             {/* Memos Table */}
-            <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-                <Table>
+            <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-x-auto scrollbar-none">
+                <Table className="min-w-[700px] lg:min-w-full">
                     <TableHeader>
                         <TableRow className="hover:bg-gray-50/50 bg-gray-50/50">
                             <TableHead className="text-[10px] font-bold uppercase text-gray-400">Initiator</TableHead>
@@ -168,29 +198,39 @@ export function DepartmentMemos() {
                     </TableHeader>
                     <TableBody>
                         {filteredMemos.map((memo) => (
-                            <TableRow key={memo.id} className="hover:bg-gray-50/50 group">
+                            <TableRow key={memo._id} className="hover:bg-gray-50/50 group">
                                 <TableCell>
                                     <div className="flex items-center gap-2">
                                         <div className={cn(
                                             "h-2 w-2 rounded-full",
                                             memo.isRead ? "bg-transparent" : "bg-primary"
                                         )} title={memo.isRead ? "Read" : "Unread"} />
-                                        <span className="font-medium text-gray-900 text-sm">{memo.initiator}</span>
+                                        <span className="font-medium text-gray-900 text-sm">{memo.fromName}</span>
                                     </div>
                                 </TableCell>
                                 <TableCell className="text-gray-700 text-sm">{memo.subject}</TableCell>
                                 <TableCell className="text-gray-500 text-xs">{memo.date}</TableCell>
                                 <TableCell>{getStatusBadge(memo.status)}</TableCell>
                                 <TableCell className="text-right">
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="text-primary hover:text-primary/90 gap-1"
-                                        onClick={() => router.push(`/dashboard/memos/inbox/${memo.id}`)}
-                                    >
-                                        <Eye className="h-3 w-3" />
-                                        View
-                                    </Button>
+                                    <div className="flex items-center justify-end gap-2">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="text-primary hover:text-primary/90 gap-1"
+                                            onClick={() => router.push(`/dashboard/memos/inbox/${memo._id}`)}
+                                        >
+                                            <Eye className="h-3 w-3" />
+                                            View
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="text-gray-400 hover:text-red-500 hover:bg-red-50"
+                                            onClick={() => handleDeleteIndividual(memo._id)}
+                                        >
+                                            <Trash2 className="h-3.5 w-3.5" />
+                                        </Button>
+                                    </div>
                                 </TableCell>
                             </TableRow>
                         ))}

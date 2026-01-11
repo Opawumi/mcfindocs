@@ -1,10 +1,10 @@
 'use client';
 
-import { 
-  MoreVertical, 
-  Eye, 
-  Download, 
-  Share2, 
+import {
+  MoreVertical,
+  Eye,
+  Download,
+  Share2,
   Trash2,
   Edit,
   Clock,
@@ -54,7 +54,7 @@ interface DocumentGridProps {
   onDelete?: (document: Document) => void;
 }
 
-export function DocumentGrid({ 
+export function DocumentGrid({
   documents,
   onView,
   onEdit,
@@ -77,10 +77,10 @@ export function DocumentGrid({
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
       {documents.map((doc) => {
         const FileIcon = getFileIconComponent(doc.fileType);
-        
+
         return (
           <div
             key={doc.id}
@@ -88,44 +88,44 @@ export function DocumentGrid({
             className='cursor-pointer relative group'
           >
             {/* Document Icon */}
-            <div className="flex flex-col items-center text-center mb-3">
-              <div className="relative mb-2">
-                <FileIcon className="h-12 w-12 text-gray-400" />
+            <div className="flex flex-col items-center text-center mb-2 sm:mb-3">
+              <div className="relative mb-1.5 sm:mb-2">
+                <FileIcon className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400" />
                 {doc.metadata.tags && doc.metadata.tags.length > 0 && (
-                  <div className="absolute -top-1 -right-1">
-                    <div className="h-3 w-3 rounded-full bg-primary" />
+                  <div className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1">
+                    <div className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-primary" />
                   </div>
                 )}
               </div>
-              
+
               {/* Document Name */}
               <div
-                className="text-sm font-medium text-gray-900 hover:text-primary transition-colors line-clamp-2 w-full"
+                className="text-xs sm:text-sm font-medium text-gray-900 hover:text-primary transition-colors line-clamp-2 w-full px-1"
                 title={doc.name}
               >
                 {doc.name}
               </div>
-              
+
               {/* Document Info */}
-              <div className="space-y-1 w-full text-dark">
-                <span className="text-xs text-gray-500">
+              <div className="space-y-0.5 sm:space-y-1 w-full text-dark mt-1">
+                <span className="text-[10px] sm:text-xs text-gray-500">
                   {formatFileSize(doc.fileSize)}
                 </span>{" • "}
-                <span className="text-xs text-gray-500">
+                <span className="text-[10px] sm:text-xs text-gray-500">
                   {formatRelativeDate(doc.lastModifiedAt)}
                 </span>
               </div>
             </div>
 
             {/* Actions Menu */}
-            <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute top-0 right-0 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="default" size="icon" className="h-8 w-8 bg-dark text-white rounded-full shadow-sm">
-                    <MoreVertical className="h-4 w-4" />
+                  <Button variant="default" size="icon" className="h-7 w-7 sm:h-8 sm:w-8 bg-dark text-white rounded-full shadow-sm">
+                    <MoreVertical className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" onClick={(e)=>e.stopPropagation()}>
+                <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
                   <DropdownMenuItem onClick={() => onView?.(doc)}>
                     <Eye className="mr-2 h-4 w-4" />
                     View
@@ -147,7 +147,7 @@ export function DocumentGrid({
                     Version History
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     onClick={() => onDelete?.(doc)}
                     className="text-red-600"
                   >

@@ -4,11 +4,11 @@ import { useState } from 'react';
 import { Upload, Filter, ArrowLeft, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { 
-  DocumentGrid, 
-  DocumentUploadDialog, 
+import {
+  DocumentGrid,
+  DocumentUploadDialog,
   DocumentShareDialog,
-  DocumentViewer 
+  DocumentViewer
 } from '@/features/documents';
 import { mockDocuments, mockCategories } from '@/lib/mock-data';
 import { useRouter } from 'next/navigation';
@@ -28,24 +28,24 @@ export default function DocumentsPage() {
   // Filter documents by category (including sub-categories)
   const filteredDocuments = selectedCategoryId
     ? documents.filter(doc => {
-        // Get all category IDs that should be included (parent + children)
-        const category = mockCategories.find(c => c.id === selectedCategoryId);
-        if (!category) return false;
-        
-        // Include documents from this category
-        if (doc.categoryId === selectedCategoryId) return true;
-        
-        // Include documents from sub-categories
-        const subCategories = mockCategories.filter(c => c.parentId === selectedCategoryId);
-        return subCategories.some(sub => doc.categoryId === sub.id);
-      })
+      // Get all category IDs that should be included (parent + children)
+      const category = mockCategories.find(c => c.id === selectedCategoryId);
+      if (!category) return false;
+
+      // Include documents from this category
+      if (doc.categoryId === selectedCategoryId) return true;
+
+      // Include documents from sub-categories
+      const subCategories = mockCategories.filter(c => c.parentId === selectedCategoryId);
+      return subCategories.some(sub => doc.categoryId === sub.id);
+    })
     : documents;
 
   // Further filter by search query
   const searchedDocuments = searchQuery
     ? filteredDocuments.filter(doc =>
-        doc.name.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      doc.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
     : filteredDocuments;
 
   // Get current category info for display
@@ -94,31 +94,31 @@ export default function DocumentsPage() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-start gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-start gap-3">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => router.push('/dashboard')}
-            className="h-8 w-8"
+            className="h-8 w-8 shrink-0"
           >
             <ArrowLeft className="h-4 w-4 text-dark hover:text-white" />
           </Button>
           <div>
-            <h1 className="text-2xl font-bold text-dark">Documents</h1>
-            <p className="text-sm text-dark mt-1">
+            <h1 className="text-xl sm:text-2xl font-bold text-dark truncate">Documents</h1>
+            <p className="text-xs sm:text-sm text-dark mt-1 line-clamp-1">
               Browse and manage organizational documents
             </p>
           </div>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm">
-            <Filter className="h-4 w-4 mr-2" />
-            Filters
+        <div className="flex gap-2 w-full sm:w-auto">
+          <Button variant="outline" size="sm" className="flex-1 sm:flex-none text-xs h-9">
+            <Filter className="h-3.5 w-3.5 sm:mr-2" />
+            <span className="hidden sm:inline">Filters</span>
           </Button>
-          <Button size="sm" onClick={() => setUploadDialogOpen(true)}>
-            <Upload className="h-4 w-4 mr-2" />
-            Upload
+          <Button size="sm" onClick={() => setUploadDialogOpen(true)} className="flex-1 sm:flex-none text-xs h-9">
+            <Upload className="h-3.5 w-3.5 sm:mr-2" />
+            <span className="hidden sm:inline">Upload</span>
           </Button>
         </div>
       </div>
@@ -131,16 +131,16 @@ export default function DocumentsPage() {
           placeholder="Search documents..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10"
+          className="pl-10 h-10 text-sm"
         />
       </div>
 
       {/* Category Context */}
       {currentCategory && (
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
           <div>
-            <h2 className="text-lg font-semibold text-dark">{currentCategory.name}</h2>
-            <p className="text-sm text-dark/60">
+            <h2 className="text-base sm:text-lg font-semibold text-dark truncate">{currentCategory.name}</h2>
+            <p className="text-xs sm:text-sm text-dark/60">
               {searchedDocuments.length} {searchedDocuments.length === 1 ? 'document' : 'documents'}
             </p>
           </div>
@@ -148,7 +148,7 @@ export default function DocumentsPage() {
             variant="ghost"
             size="sm"
             onClick={() => setSelectedCategoryId(null)}
-            className="text-dark/60 hover:text-dark"
+            className="text-dark/60 hover:text-dark text-xs h-8 w-full sm:w-auto"
           >
             Clear filter
           </Button>

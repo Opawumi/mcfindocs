@@ -1,25 +1,40 @@
 'use client';
 
-import { use } from 'react';
+import { use, useEffect, useState } from 'react';
 import { MemoDetail } from '@/features/memos';
+import { toast } from 'sonner';
 
 export default function MemoDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
+    const [memo, setMemo] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
 
-    // Mock data - in a real app, you would fetch the memo by id
-    const mockMemo = {
-        id: id,
-        from: 'divandsection@gmail.com',
-        fromName: 'Dr. Sarah Connor',
-        fromDept: 'Computer Science',
-        fromDesignation: 'Professor',
-        to: ['Registrar', 'Bursar', 'VC'],
-        subject: 'Testing on demo Memo for Senate',
-        message: 'We would like to inform you that there will be a scheduled system maintenance this weekend. Please ensure all critical documents are saved before Friday 5:00 PM.\n\nBest regards,\nSarah.',
-        date: 'Aug 23',
-        status: 'approved' as const,
-        isFinancial: true,
-    };
+    useEffect(() => {
+        const fetchMemo = async () => {
+            try {
+                const res = await fetch(`/api/memos/${id}`);
+                const result = await res.json();
+                if (result.success) {
+                    setMemo(result.data);
+                } else {
+                    toast.error('Failed to load memo');
+                }
+            } catch (error) {
+                toast.error('An error occurred');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchMemo();
+    }, [id]);
 
-    return <MemoDetail memo={mockMemo} />;
+    if (loading) {
+        return <div className="p-8 text-center text-gray-500">Loading memo details...</div>;
+    }
+
+    if (!memo) {
+        return <div className="p-8 text-center text-red-500">Memo not found</div>;
+    }
+
+    return <MemoDetail memo={memo} />;
 }

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { QueryProvider, ThemeProvider, ToastProvider } from "@/providers";
+import { QueryProvider, ThemeProvider, ToastProvider, AuthProvider } from "@/providers";
 
 export const metadata: Metadata = {
   title: "McFin Docs - Enterprise Document Management System",
@@ -27,7 +27,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <QueryProvider>
-            {children}
+            <AuthProvider>
+              {children}
+            </AuthProvider>
             <ToastProvider />
           </QueryProvider>
         </ThemeProvider>

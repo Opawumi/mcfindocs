@@ -1,7 +1,10 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { Search, Bell, User, Settings, LogOut } from 'lucide-react';
-import { useAuthStore, useUIStore } from '@/stores';
+import { useSession, signOut } from 'next-auth/react';
+import { useUIStore } from '@/stores';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -16,18 +19,63 @@ import { Badge } from '@/components/ui/badge';
 import { getInitials } from '@/lib/utils';
 
 export function AppHeader() {
-  const { user, logout } = useAuthStore();
-  const { notifications, unreadNotificationsCount } = useUIStore();
+  const { data: session } = useSession();
+  const { notifications, unreadNotificationsCount, toggleSidebar, setSidebarOpen } = useUIStore();
+  const [mounted, setMounted] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    setMounted(true);
+    // Auto-close sidebar on mobile after navigation
+    setSidebarOpen(false);
+  }, [pathname, setSidebarOpen]);
 
   const handleLogout = () => {
-    logout();
-    window.location.href = '/login';
+    signOut({ callbackUrl: '/login' });
   };
 
+  if (!mounted) {
+    return (
+      <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-gray-200 bg-white px-4 md:px-6">
+        <div className="flex-1 max-w-md hidden md:block">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <input
+              type="search"
+              placeholder="Search..."
+              className="h-10 w-full rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-sm"
+              disabled
+            />
+          </div>
+        </div>
+        <div className="flex-1 md:hidden" />
+        <div className="flex items-center gap-3">
+          <div className="h-9 w-9 rounded-full bg-gray-100 animate-pulse" />
+        </div>
+      </header>
+    );
+  }
+
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-gray-200 bg-white px-6">
-      {/* Search */}
-      <div className="flex-1 max-w-md">
+    <header className="sticky top-0 z-30 flex h-16 items-center gap-2 md:gap-4 border-b border-gray-200 bg-white px-4 md:px-6">
+      {/* Mobile Menu Toggle */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="lg:hidden h-9 w-9"
+        onClick={toggleSidebar}
+      >
+        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </Button>
+
+      <div className="flex items-center gap-2 lg:hidden">
+        <span className="text-lg font-bold text-primary truncate max-w-[120px]">McFin</span>
+      </div>
+
+      {/* Search - Desktop */}
+      <div className="flex-1 max-w-md hidden md:block">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
           <input
@@ -38,8 +86,15 @@ export function AppHeader() {
         </div>
       </div>
 
+      <div className="flex-1 md:hidden" />
+
       {/* Right Section */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-1 md:gap-3">
+        {/* Search - Mobile Toggle (Placeholder) */}
+        <Button variant="ghost" size="icon" className="md:hidden h-9 w-9">
+          <Search className="h-5 w-5 text-gray-600" />
+        </Button>
+
         {/* Notifications */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -48,14 +103,14 @@ export function AppHeader() {
               {unreadNotificationsCount > 0 && (
                 <Badge
                   variant="destructive"
-                  className="absolute -right-1 -top-1 h-5 min-w-5 rounded-full px-1 text-[10px] font-semibold"
+                  className="absolute -right-0 -top-0 h-4 min-w-4 flex items-center justify-center rounded-full px-0.5 text-[8px] font-bold"
                 >
                   {unreadNotificationsCount}
                 </Badge>
               )}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80">
+          <DropdownMenuContent align="end" className="w-[calc(100vw-32px)] md:w-80">
             <DropdownMenuLabel className="font-semibold">Notifications</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {notifications.length === 0 ? (
@@ -88,23 +143,28 @@ export function AppHeader() {
         {/* User Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-9 gap-2 px-2 hover:bg-gray-100">
+            <Button variant="ghost" className="h-9 gap-2 px-1 md:px-2 hover:bg-gray-100">
               <Avatar className="h-7 w-7">
-                <AvatarImage src={user?.profilePicture} alt={user?.name} />
-                <AvatarFallback className="bg-primary text-white text-xs font-semibold">
-                  {user ? getInitials(user.name) : 'U'}
+                <AvatarImage src={(session?.user as any)?.image} alt={session?.user?.name || ''} />
+                <AvatarFallback className="bg-primary text-white text-[10px] font-semibold">
+                  {session?.user?.name ? getInitials(session.user.name) : 'U'}
                 </AvatarFallback>
               </Avatar>
-              <span className="text-sm font-medium text-gray-700 hidden md:inline-block">
-                {user?.name}
-              </span>
+              <div className="flex flex-col items-start hidden sm:flex">
+                <span className="text-[11px] font-bold text-gray-900 leading-none">
+                  {session?.user?.name}
+                </span>
+                <span className="text-[9px] text-gray-500 font-medium">
+                  {(session?.user as any)?.role || 'User'}
+                </span>
+              </div>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                <p className="text-xs text-gray-600">{user?.email}</p>
+                <p className="text-sm font-medium text-gray-900">{session?.user?.name}</p>
+                <p className="text-xs text-gray-600">{session?.user?.email}</p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
