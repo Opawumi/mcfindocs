@@ -15,13 +15,13 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Search, FileText } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import type { Document, Folder } from '@/lib/types';
+import type { Document, Folder as FolderType } from '@/lib/types';
 import { formatFileSize } from '@/lib/utils';
 
 interface AddDocumentsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  folder: Folder | null;
+  folder: FolderType | null;
   allDocuments: Document[];
   documentsInFolder: string[]; // Array of document IDs already in folder
   onAddDocuments?: (documentIds: string[]) => void;
@@ -149,22 +149,21 @@ export function AddDocumentsDialog({
                 return (
                   <div
                     key={doc.id}
-                    className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
-                      isInFolder
+                    className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${isInFolder
                         ? 'bg-gray-50 border-gray-200 opacity-60'
                         : isSelected
-                        ? 'bg-primary/5 border-primary'
-                        : 'hover:bg-gray-50 border-gray-200'
-                    }`}
+                          ? 'bg-primary/5 border-primary'
+                          : 'hover:bg-gray-50 border-gray-200'
+                      }`}
                   >
                     <Checkbox
                       checked={isSelected}
                       onCheckedChange={() => toggleDocument(doc.id)}
                       disabled={isInFolder}
                     />
-                    
+
                     <FileText className="h-5 w-5 text-gray-400 shrink-0" />
-                    
+
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <p className="text-sm font-medium text-gray-900 truncate">

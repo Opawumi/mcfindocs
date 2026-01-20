@@ -12,12 +12,12 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import type { Folder } from '@/lib/types';
+import type { Folder as FolderType } from '@/lib/types';
 
 interface RenameFolderDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  folder: Folder | null;
+  folder: FolderType | null;
   onRename?: (folderId: string, newName: string) => void;
 }
 

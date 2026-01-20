@@ -12,14 +12,14 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import type { Folder } from '@/lib/types';
+import type { Folder as FolderType } from '@/lib/types';
 import { FolderTreeSelector } from './folder-tree-selector';
 import { useFolderContext } from '@/contexts/folder-context';
 
 interface CreateFolderDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  folders: Folder[];
+  folders: FolderType[];
   parentId?: string; // Initial parent ID (e.g., from sidebar button)
   onCreate?: (name: string, parentId?: string) => void;
 }
