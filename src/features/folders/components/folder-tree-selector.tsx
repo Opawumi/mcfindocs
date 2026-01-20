@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronRight, ChevronDown, Folder as FolderIcon } from 'lucide-react';
+import { ChevronRight, ChevronDown, Folder as LucideFolder } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { buildFolderTree, type FolderWithChildren } from '@/lib/utils/folder';
 import type { Folder } from '@/lib/types';
@@ -70,7 +70,7 @@ function FolderTreeItem({
         ) : (
           <div className="w-4" />
         )}
-        <FolderIcon className="h-4 w-4 shrink-0" />
+        <LucideFolder className="h-4 w-4 shrink-0" />
         <span className="flex-1 text-left">{folder.name}</span>
       </div>
 
@@ -112,7 +112,7 @@ export function FolderTreeSelector({
           )}
           onClick={() => onSelect(undefined)}
         >
-          <FolderIcon className="h-4 w-4 shrink-0" />
+          <LucideFolder className="h-4 w-4 shrink-0" />
           <span className="flex-1 text-left">Root (No parent)</span>
         </div>
         {folderTree.map((folder) => (
