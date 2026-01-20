@@ -4,11 +4,11 @@ import { useState } from 'react';
 import { ChevronRight, ChevronDown, Folder as LucideFolder } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { buildFolderTree, type FolderWithChildren } from '@/lib/utils/folder';
-import type { Folder } from '@/lib/types';
+import type { Folder as FolderType } from '@/lib/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface FolderTreeSelectorProps {
-  folders: Folder[];
+  folders: FolderType[];
   selectedFolderId?: string;
   onSelect: (folderId: string | undefined) => void;
   excludeFolderId?: string; // Exclude this folder and its children from selection

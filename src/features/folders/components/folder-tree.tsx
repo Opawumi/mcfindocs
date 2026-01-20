@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Folder as FolderIcon, ChevronRight, ChevronDown, MoreVertical, Plus, Edit, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { buildFolderTree, type FolderWithChildren } from '@/lib/utils/folder';
-import type { Folder } from '@/lib/types';
+import type { Folder as FolderType } from '@/lib/types';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -140,7 +140,7 @@ function FolderTreeItem({
 }
 
 interface FolderTreeProps {
-  folders: Folder[];
+  folders: FolderType[];
   selectedFolderId: string | null;
   onSelectFolder: (folderId: string | null) => void;
   onCreateFolder: (parentId?: string) => void;
