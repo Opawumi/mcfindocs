@@ -96,6 +96,7 @@ export interface Document {
   viewCount: number;
   downloadCount: number;
   isShared: boolean;
+  sharedWith?: { userId: string; email?: string; permissions: Permission[] }[];
   notes?: DocumentNote[];
 }
 

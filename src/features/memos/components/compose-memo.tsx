@@ -84,11 +84,14 @@ export function ComposeMemo() {
                         setFormData({
                             to: m.to || [],
                             cc: m.cc || [],
+                            bcc: m.bcc || [],
+                            replyTo: m.replyTo || '',
                             subject: m.subject || '',
                             sideNote: m.sideNote || '',
                             recommender: m.recommender || [],
                             approver: m.approver || [],
                             message: m.message || '',
+                            status: m.status || 'pending',
                             isFinancial: m.isFinancial || false,
                             attachments: m.attachments || [],
                         });
