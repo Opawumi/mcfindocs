@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, RotateCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -24,37 +24,26 @@ export function PDFViewerClient({ file, className }: PDFViewerClientProps) {
   const [error, setError] = useState<string | null>(null);
   const [pdfModule, setPdfModule] = useState<any>(null);
 
+  const options = useMemo(() => ({
+    workerSrc: typeof window !== 'undefined' ? `${window.location.origin}/pdf.worker.min.mjs` : '',
+  }), []);
+
   // Lazy load react-pdf only on client side
   useEffect(() => {
     let mounted = true;
 
     const loadPdf = async () => {
       try {
-        // Import CSS first (these don't cause PDF.js to initialize)
+        // Import CSS first
         await import('react-pdf/dist/Page/TextLayer.css');
         await import('react-pdf/dist/Page/AnnotationLayer.css');
 
-        // Small delay to ensure browser is ready
-        await new Promise((resolve) => setTimeout(resolve, 100));
-
-        // Dynamically import react-pdf and configure worker
+        // Import react-pdf and get pdfjs reference from it
         const reactPdf = await import('react-pdf');
         const { pdfjs, Document, Page } = reactPdf;
 
-        // Configure worker BEFORE any pdfjs operations
-        // Use CDN worker for reliability - avoids local file path issues
-        // Get version from pdfjs or use a known compatible version
-        const pdfjsVersion = pdfjs.version || '4.10.38';
-        
-        // Use CDN worker - more reliable than local file
-        // This avoids "Object.defineProperty called on non-object" errors
-        pdfjs.GlobalWorkerOptions.workerSrc = 
-          `https://unpkg.com/pdfjs-dist@${pdfjsVersion}/build/pdf.worker.min.js`;
-
-        // Verify worker is configured
-        if (!pdfjs.GlobalWorkerOptions.workerSrc) {
-          throw new Error('Failed to configure PDF.js worker');
-        }
+        // Configure worker immediately after import
+        pdfjs.GlobalWorkerOptions.workerSrc = `${window.location.origin}/pdf.worker.min.mjs`;
 
         if (mounted) {
           setPdfModule({ Document, Page, pdfjs });
@@ -138,6 +127,7 @@ export function PDFViewerClient({ file, className }: PDFViewerClientProps) {
     return file;
   })();
 
+
   if (!normalizedFile) {
     return (
       <div className="flex flex-col items-center justify-center h-full p-8">
@@ -204,6 +194,7 @@ export function PDFViewerClient({ file, className }: PDFViewerClientProps) {
           onLoadError={onDocumentLoadError}
           loading={null}
           className="flex flex-col items-center"
+          options={options}
           error={
             <div className="flex flex-col items-center justify-center p-8">
               <p className="text-red-600 mb-2">Failed to load PDF document</p>

@@ -20,10 +20,16 @@ import {
 interface Memo {
     _id: string;
     from: string;
+    fromName?: string;
+    fromDept?: string;
     to: string[];
+    cc: string[];
+    bcc: string[];
     subject: string;
     status: 'initiated' | 'pending' | 'reviewed' | 'approved';
     date: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export function MemoTracking() {
@@ -56,11 +62,23 @@ export function MemoTracking() {
         fetchMemos();
     }, [currentUserEmail]);
 
-    const filteredMemos = memos.filter(
-        (memo: Memo) =>
-            memo.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            memo.to.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()))
-    );
+    const filteredMemos = memos.filter((memo: Memo) => {
+        const query = searchQuery.toLowerCase();
+        const initiatedDate = memo.createdAt ? new Date(memo.createdAt).toLocaleDateString('en-GB').toLowerCase() : memo.date.toLowerCase();
+        const updatedDate = memo.updatedAt ? new Date(memo.updatedAt).toLocaleDateString('en-GB').toLowerCase() : '';
+
+        return (
+            memo.subject.toLowerCase().includes(query) ||
+            initiatedDate.includes(query) ||
+            updatedDate.includes(query) ||
+            (memo.fromDept && memo.fromDept.toLowerCase().includes(query)) ||
+            (memo.fromName && memo.fromName.toLowerCase().includes(query)) ||
+            memo.from.toLowerCase().includes(query) ||
+            memo.to.some(t => t.toLowerCase().includes(query)) ||
+            (memo.cc && memo.cc.some(c => c.toLowerCase().includes(query))) ||
+            (memo.bcc && memo.bcc.some(b => b.toLowerCase().includes(query)))
+        );
+    });
 
     const currentPage = 1;
     const totalPages = 1;
@@ -133,9 +151,9 @@ export function MemoTracking() {
                             <TableHead className="w-[200px] font-semibold">Reference No</TableHead>
                             <TableHead className="font-semibold">Subject</TableHead>
                             <TableHead className="w-[100px] font-semibold">Status</TableHead>
-                            <TableHead className="w-[120px] font-semibold">Memo Date</TableHead>
+                            <TableHead className="w-[120px] font-semibold">Initiated Date</TableHead>
+                            <TableHead className="w-[120px] font-semibold">Update Date</TableHead>
                             <TableHead className="font-semibold">From</TableHead>
-                            <TableHead className="font-semibold">To</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -168,12 +186,17 @@ export function MemoTracking() {
                                             {getStatusDisplay(memo.status)}
                                         </span>
                                     </TableCell>
-                                    <TableCell className="text-gray-600">{memo.date}</TableCell>
-                                    <TableCell className="text-gray-600 truncate max-w-[200px]" title={memo.from}>
-                                        {memo.from}
+                                    <TableCell className="text-gray-600">
+                                        {memo.createdAt ? new Date(memo.createdAt).toLocaleDateString('en-GB') : memo.date}
                                     </TableCell>
-                                    <TableCell className="text-gray-600 truncate max-w-[200px]" title={memo.to.join(', ')}>
-                                        {memo.to.join(', ')}
+                                    <TableCell className="text-gray-600">
+                                        {memo.updatedAt ? new Date(memo.updatedAt).toLocaleDateString('en-GB') : '-'}
+                                    </TableCell>
+                                    <TableCell className="text-gray-600 truncate max-w-[200px]" title={memo.from}>
+                                        <div className="flex flex-col">
+                                            <span className="font-medium text-gray-900">{memo.fromName || memo.from}</span>
+                                            {memo.fromDept && <span className="text-xs text-gray-500">{memo.fromDept}</span>}
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ))

@@ -1,4 +1,32 @@
-export default function DashboardPage() {
+import {
+  getTotalDocumentsCount,
+  getSharedDocumentsCount,
+  getRecentActivity
+} from "@/services/document.service";
+import { getMyFoldersCount } from "@/services/folder.service";
+import { getUnreadCount } from "@/services/memo.service";
+import { getCurrentUser } from "@/lib/mock-data/users.mock";
+import { formatRelativeTime } from "@/lib/utils";
+import { FileText, Folder, Mail, Share2, File as FileIcon } from "lucide-react";
+
+export default async function DashboardPage() {
+  const currentUser = getCurrentUser();
+
+  // Fetch data in parallel
+  const [
+    totalDocuments,
+    myFoldersCount,
+    unreadMemosCount,
+    sharedDocumentsCount,
+    recentDocuments
+  ] = await Promise.all([
+    getTotalDocumentsCount(),
+    getMyFoldersCount(currentUser.id),
+    getUnreadCount(currentUser.id),
+    getSharedDocumentsCount(currentUser.id),
+    getRecentActivity(5)
+  ]);
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -11,58 +39,54 @@ export default function DashboardPage() {
 
       {/* Stats Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {/* Total Documents */}
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Total Documents</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">1,234</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">{totalDocuments.toLocaleString()}</p>
             </div>
             <div className="h-12 w-12 rounded-lg bg-green-50 flex items-center justify-center">
-              <svg className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
+              <FileText className="h-6 w-6 text-green-600" />
             </div>
           </div>
         </div>
 
+        {/* My Folders */}
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">My Folders</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">12</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">{myFoldersCount.toLocaleString()}</p>
             </div>
             <div className="h-12 w-12 rounded-lg bg-blue-50 flex items-center justify-center">
-              <svg className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-              </svg>
+              <Folder className="h-6 w-6 text-blue-600" />
             </div>
           </div>
         </div>
 
+        {/* Unread Memos */}
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Unread Memos</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">3</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">{unreadMemosCount.toLocaleString()}</p>
             </div>
             <div className="h-12 w-12 rounded-lg bg-yellow-50 flex items-center justify-center">
-              <svg className="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
+              <Mail className="h-6 w-6 text-yellow-600" />
             </div>
           </div>
         </div>
 
+        {/* Shared with Me */}
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Shared with Me</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">45</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">{sharedDocumentsCount.toLocaleString()}</p>
             </div>
             <div className="h-12 w-12 rounded-lg bg-purple-50 flex items-center justify-center">
-              <svg className="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-              </svg>
+              <Share2 className="h-6 w-6 text-purple-600" />
             </div>
           </div>
         </div>
@@ -73,8 +97,33 @@ export default function DashboardPage() {
         <div className="border-b border-gray-200 px-6 py-4">
           <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
         </div>
-        <div className="p-6">
-          <p className="text-sm text-gray-600">Recent document activity will appear here</p>
+        <div className="divide-y divide-gray-100">
+          {recentDocuments.length > 0 ? (
+            recentDocuments.map((doc) => (
+              <div key={doc.id} className="flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
+                <div className="flex items-center space-x-4">
+                  <div className="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                    <FileIcon className="h-5 w-5 text-gray-500" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-900">{doc.name}</h3>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      Modified {formatRelativeTime(doc.lastModifiedAt)} by {doc.lastModifiedBy}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">
+                    {doc.fileType}
+                  </span>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="p-6 text-center text-sm text-gray-500">
+              No recent activity
+            </div>
+          )}
         </div>
       </div>
     </div>

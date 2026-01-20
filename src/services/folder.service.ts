@@ -114,3 +114,12 @@ export async function moveDocumentToFolder(
   // In real implementation, this would update the document's folderId
   console.log("Moving document to folder:", { documentId, folderId });
 }
+
+/**
+ * Get count of user's folders
+ */
+export async function getMyFoldersCount(userId: string): Promise<number> {
+  await sleep(100);
+  const folders = getUserFolders(userId);
+  return folders.length;
+}

@@ -13,6 +13,7 @@ import {
   ChevronDown,
   Video,
   LogOut,
+  GraduationCap,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/stores';
@@ -92,6 +93,11 @@ const navItems: NavItem[] = [
     title: 'E-Meetings',
     href: '/dashboard/meetings',
     icon: Video,
+  },
+  {
+    title: 'E-Senate',
+    href: '/dashboard/senate',
+    icon: GraduationCap,
   },
 ];
 

@@ -69,6 +69,9 @@ export function DocumentViewer({
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
         <DialogPrimitive.Content className="fixed left-[50%] top-[50%] z-50 w-[95vw] h-[95vh] translate-x-[-50%] translate-y-[-50%] bg-white shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 rounded-lg flex flex-col overflow-hidden">
+          <DialogPrimitive.Title className="sr-only">
+            {document.name}
+          </DialogPrimitive.Title>
           {/* Header - Hidden in fullscreen */}
           {!isFullScreen && (
             <div className="flex items-center justify-between p-4 border-b bg-white shrink-0">
@@ -151,8 +154,8 @@ export function DocumentViewer({
                     </Button>
                   </div>
                 )}
-                <PDFViewerClient 
-                  file={document.fileUrl} 
+                <PDFViewerClient
+                  file={document.fileUrl}
                   className="flex-1"
                 />
               </div>

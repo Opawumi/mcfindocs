@@ -289,3 +289,31 @@ export async function downloadDocument(id: string): Promise<void> {
   // Update download count
   document.downloadCount++;
 }
+
+/**
+ * Get total documents count
+ */
+export async function getTotalDocumentsCount(): Promise<number> {
+  await sleep(200);
+  return mockDocuments.length;
+}
+
+/**
+ * Get shared documents count
+ */
+export async function getSharedDocumentsCount(userId: string): Promise<number> {
+  await sleep(200);
+  return mockDocuments.filter(doc => 
+    doc.sharedWith?.some(share => share.userId === userId)
+  ).length;
+}
+
+/**
+ * Get recent activity
+ */
+export async function getRecentActivity(limit: number = 5): Promise<Document[]> {
+  await sleep(300);
+  return [...mockDocuments]
+    .sort((a, b) => new Date(b.lastModifiedAt).getTime() - new Date(a.lastModifiedAt).getTime())
+    .slice(0, limit);
+}

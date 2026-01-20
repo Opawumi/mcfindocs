@@ -37,6 +37,15 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 const ReactQuill = dynamic(() => import('react-quill-new'), {
     ssr: false,
@@ -75,24 +84,90 @@ export function MemoDetail({ memo: initialMemo }: any) {
     // Forwarding State
     const [isForwardOpen, setIsForwardOpen] = useState(false);
     const [forwardForm, setForwardForm] = useState({
-        recipient: '',
+        toEmails: [] as string[],
+        ccEmails: [] as string[],
+        bccEmails: [] as string[],
+        replyTo: '',
         office: '',
         message: '',
         file: null as File | null
     });
 
-    const handleForwardSubmit = () => {
-        // Logic to forward would go here (e.g., API call)
-        console.log('Forwarding to:', forwardForm);
-        toast.success(`Memo forwarded to ${forwardForm.recipient}`);
-        setIsForwardOpen(false);
-        setForwardForm({ recipient: '', office: '', message: '', file: null });
+    const [showForwardCc, setShowForwardCc] = useState(false);
+    const [showForwardBcc, setShowForwardBcc] = useState(false);
+    const [showForwardReplyTo, setShowForwardReplyTo] = useState(false);
+
+    const addForwardRecipient = (type: 'toEmails' | 'ccEmails' | 'bccEmails', email: string) => {
+        if (!forwardForm[type].includes(email)) {
+            setForwardForm({
+                ...forwardForm,
+                [type]: [...forwardForm[type], email]
+            });
+        }
+    };
+
+    const removeForwardRecipient = (type: 'toEmails' | 'ccEmails' | 'bccEmails', email: string) => {
+        setForwardForm({
+            ...forwardForm,
+            [type]: forwardForm[type].filter(e => e !== email)
+        });
+    };
+
+    const handleForwardSubmit = async () => {
+        if (!forwardForm.toEmails.length) {
+            toast.error('Please select at least one main recipient');
+            return;
+        }
+
+        setUpdating(true);
+        try {
+            // In a real app, this would hit /api/memos/forward
+            // For now, simulator success
+            toast.success(`Memo forwarded successfully`);
+            setIsForwardOpen(false);
+            setForwardForm({ toEmails: [], ccEmails: [], bccEmails: [], replyTo: '', office: '', message: '', file: null });
+        } catch (error) {
+            toast.error('Failed to forward memo');
+        } finally {
+            setUpdating(false);
+        }
     };
 
     // Sync memo state when initialMemo changes
     useEffect(() => {
         setMemo(initialMemo);
     }, [initialMemo]);
+
+    const [offices, setOffices] = useState<string[]>([]);
+    const [allUsers, setAllUsers] = useState<any[]>([]);
+    const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const userRes = await fetch('/api/users');
+                const userData = await userRes.json();
+                if (userData.success) {
+                    setAllUsers(userData.data);
+                    const depts = Array.from(new Set(userData.data.map((u: any) => u.department))) as string[];
+                    setOffices(depts);
+                }
+            } catch (error) {
+                console.error("Error fetching users:", error);
+            }
+        };
+        fetchData();
+    }, []);
+
+    useEffect(() => {
+        if (forwardForm.office && forwardForm.office !== 'all') {
+            // Filter by specific department
+            setFilteredUsers(allUsers.filter(u => u.department === forwardForm.office));
+        } else {
+            // Show all users when 'all' is selected or nothing is selected
+            setFilteredUsers(allUsers);
+        }
+    }, [forwardForm.office, allUsers]);
 
     const steps = [
         { id: 'initiated', label: 'Initiated', icon: Clock },
@@ -357,57 +432,177 @@ export function MemoDetail({ memo: initialMemo }: any) {
                     <Button
                         variant="ghost"
                         size="icon"
-                        onClick={handleDelete}
-                        disabled={updating}
-                        className="h-9 w-9 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md shrink-0 transition-colors"
-                        title="Delete Memo"
+                        onClick={handleArchive}
+                        disabled={updating || memo.isArchived}
+                        className={cn(
+                            "h-9 w-9 rounded-md shrink-0 transition-colors",
+                            memo.isArchived ? "text-gray-300 pointer-events-none" : "text-gray-400 hover:text-primary hover:bg-primary/5"
+                        )}
+                        title="Archive Memo"
                     >
-                        <Trash2 className="h-4 w-4" />
+                        <Archive className="h-4 w-4" />
                     </Button>
-                    {!memo.isArchived && memo.status === 'approved' && (
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={handleArchive}
-                            disabled={updating}
-                            className="h-9 w-9 text-gray-400 hover:text-primary hover:bg-primary/5"
-                            title="Archive Memo"
-                        >
-                            <Archive className="h-5 w-5" />
-                        </Button>
-                    )}
                 </div>
             </div>
 
-            {/* Status Stepper */}
-            <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200 shadow-sm overflow-x-auto scrollbar-none">
-                <div className="flex items-center justify-between relative min-w-[500px]">
-                    {/* Line behind */}
-                    <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gray-100 -translate-y-1/2" />
+            {/* Hierarchical Workflow Display */}
+            <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm overflow-x-auto">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-6 text-center">Memo Approval Workflow</h3>
 
-                    {steps.map((step, index) => {
-                        const isCompleted = index <= currentStepIndex;
-                        const isCurrent = index === currentStepIndex;
-                        const StepIcon = step.icon;
-
-                        return (
-                            <div key={step.id} className="flex flex-col items-center relative z-10 bg-white px-2">
-                                <div className={cn(
-                                    "h-8 w-8 sm:h-10 sm:w-10 rounded-full flex items-center justify-center border-2 transition-colors",
-                                    isCompleted ? "bg-primary border-primary text-white" : "bg-white border-gray-200 text-gray-400",
-                                    isCurrent && "ring-4 ring-primary/20"
-                                )}>
-                                    <StepIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-                                </div>
-                                <span className={cn(
-                                    "mt-2 text-[10px] sm:text-xs font-bold uppercase tracking-tight",
-                                    isCompleted ? "text-primary" : "text-gray-400"
-                                )}>
-                                    {step.label}
-                                </span>
+                <div className="flex items-start gap-0 min-w-max pb-4">
+                    {/* 1. Initiator */}
+                    <div className="flex items-center">
+                        <div className="flex flex-col items-center px-4">
+                            <div className="h-16 w-16 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                                <User className="h-7 w-7" />
                             </div>
-                        );
-                    })}
+                            <div className="mt-3 text-center min-w-[140px] max-w-[160px]">
+                                <div className="flex items-center justify-center gap-1 mb-1">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Initiator</span>
+                                </div>
+                                <p className="font-semibold text-sm text-gray-900 truncate">{memo.fromName}</p>
+                                <p className="text-[10px] text-gray-500 uppercase truncate">{memo.fromDesignation}</p>
+                                <p className="text-[9px] text-gray-400 mt-0.5">{new Date(memo.createdAt || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</p>
+                            </div>
+                        </div>
+                        {/* Connector line */}
+                        {((memo.recommender && memo.recommender.length > 0) || (memo.approver && memo.approver.length > 0) || (memo.cc && memo.cc.length > 0)) && (
+                            <div className="h-0.5 w-12 bg-gray-300 mt-8" />
+                        )}
+                    </div>
+
+                    {/* 2. Recommenders */}
+                    {memo.recommender && Array.isArray(memo.recommender) && memo.recommender.length > 0 && (
+                        <>
+                            {memo.recommender.map((recommenderEmail: string, index: number) => {
+                                const recommenderUser = allUsers.find(u => u.email === recommenderEmail);
+                                const isLast = index === memo.recommender.length - 1;
+
+                                return (
+                                    <div key={recommenderEmail} className="flex items-center">
+                                        <div className="flex flex-col items-center px-4">
+                                            <div className="h-16 w-16 rounded-full bg-blue-50 border-2 border-blue-200 flex items-center justify-center text-blue-700 font-bold text-lg shadow-md">
+                                                {recommenderUser ? recommenderUser.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().substring(0, 2) : 'R'}
+                                            </div>
+                                            <div className="mt-3 text-center min-w-[140px] max-w-[160px]">
+                                                <div className="flex items-center justify-center gap-1 mb-1">
+                                                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Recommender {index + 1}</span>
+                                                </div>
+                                                <p className="font-semibold text-sm text-gray-900 truncate">{recommenderUser?.name || 'Unknown'}</p>
+                                                {recommenderUser && (
+                                                    <p className="text-[10px] text-gray-500 uppercase truncate">{recommenderUser.designation}</p>
+                                                )}
+                                                <p className="text-[9px] text-gray-600 truncate">{recommenderUser?.email || recommenderEmail}</p>
+                                            </div>
+                                        </div>
+                                        {/* Connector line */}
+                                        {(!isLast || (memo.approver && memo.approver.length > 0) || (memo.cc && memo.cc.length > 0)) && (
+                                            <div className="h-0.5 w-12 bg-gray-300 mt-8" />
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </>
+                    )}
+
+                    {/* 3. Approvers */}
+                    {memo.approver && Array.isArray(memo.approver) && memo.approver.length > 0 && (
+                        <>
+                            {memo.approver.map((approverEmail: string, index: number) => {
+                                const approverUser = allUsers.find(u => u.email === approverEmail);
+                                const isLast = index === memo.approver.length - 1;
+                                const isApproved = memo.status === 'approved';
+
+                                return (
+                                    <div key={approverEmail} className="flex items-center">
+                                        <div className="flex flex-col items-center px-4">
+                                            <div className={cn(
+                                                "h-16 w-16 rounded-full flex items-center justify-center font-bold text-lg shadow-md border-2",
+                                                isApproved ? "bg-green-100 border-green-300 text-green-700" : "bg-orange-50 border-orange-200 text-orange-700"
+                                            )}>
+                                                {isApproved ? <CheckCircle2 className="h-8 w-8" /> : (approverUser ? approverUser.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().substring(0, 2) : 'A')}
+                                            </div>
+                                            <div className="mt-3 text-center min-w-[140px] max-w-[160px]">
+                                                <div className="flex items-center justify-center gap-1 mb-1">
+                                                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Approver {index + 1}</span>
+                                                    {isApproved && <Badge className="bg-green-100 text-green-700 border-green-200 text-[8px] px-1 py-0">✓</Badge>}
+                                                </div>
+                                                <p className="font-semibold text-sm text-gray-900 truncate">{approverUser?.name || 'Unknown'}</p>
+                                                {approverUser && (
+                                                    <p className="text-[10px] text-gray-500 uppercase truncate">{approverUser.designation}</p>
+                                                )}
+                                                <p className="text-[9px] text-gray-600 truncate">{approverUser?.email || approverEmail}</p>
+                                            </div>
+                                        </div>
+                                        {/* Connector line */}
+                                        {(!isLast || (memo.cc && memo.cc.length > 0) || (memo.bcc && memo.bcc.length > 0 && memo.from === session?.user?.email)) && (
+                                            <div className="h-0.5 w-12 bg-gray-300 mt-8" />
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </>
+                    )}
+
+                    {/* 4. CC Recipients */}
+                    {memo.cc && Array.isArray(memo.cc) && memo.cc.length > 0 && (
+                        <div className="flex items-center">
+                            <div className="flex flex-col items-center px-4">
+                                <div className="h-16 w-16 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center text-gray-600 font-bold text-sm shadow-md">
+                                    <Building2 className="h-6 w-6" />
+                                </div>
+                                <div className="mt-3 text-center min-w-[140px] max-w-[160px]">
+                                    <div className="flex items-center justify-center gap-1 mb-1">
+                                        <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500">CC (Informed)</span>
+                                    </div>
+                                    <p className="font-semibold text-sm text-gray-700">{memo.cc.length} {memo.cc.length === 1 ? 'Person' : 'People'}</p>
+                                    <div className="flex flex-col gap-0.5 mt-1 max-h-[60px] overflow-y-auto text-[9px] text-gray-600">
+                                        {memo.cc.slice(0, 3).map((email: string) => {
+                                            const user = allUsers.find(u => u.email === email);
+                                            return (
+                                                <div key={email} className="truncate">
+                                                    {user ? user.name : email}
+                                                </div>
+                                            );
+                                        })}
+                                        {memo.cc.length > 3 && <div className="text-gray-400">+{memo.cc.length - 3} more</div>}
+                                    </div>
+                                </div>
+                            </div>
+                            {/* Connector line */}
+                            {memo.bcc && Array.isArray(memo.bcc) && memo.bcc.length > 0 && memo.from === session?.user?.email && (
+                                <div className="h-0.5 w-12 bg-gray-300 mt-8" />
+                            )}
+                        </div>
+                    )}
+
+                    {/* 5. BCC Recipients (Only visible to sender) */}
+                    {memo.bcc && Array.isArray(memo.bcc) && memo.bcc.length > 0 && memo.from === session?.user?.email && (
+                        <div className="flex items-center">
+                            <div className="flex flex-col items-center px-4">
+                                <div className="h-16 w-16 rounded-full bg-purple-50 border-2 border-purple-200 flex items-center justify-center text-purple-600 font-bold text-sm shadow-md">
+                                    <User className="h-6 w-6" />
+                                </div>
+                                <div className="mt-3 text-center min-w-[140px] max-w-[160px]">
+                                    <div className="flex items-center justify-center gap-1 mb-1">
+                                        <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600">BCC (Hidden)</span>
+                                    </div>
+                                    <p className="font-semibold text-sm text-purple-700">{memo.bcc.length} {memo.bcc.length === 1 ? 'Person' : 'People'}</p>
+                                    <div className="flex flex-col gap-0.5 mt-1 max-h-[60px] overflow-y-auto text-[9px] text-purple-600 italic">
+                                        {memo.bcc.slice(0, 3).map((email: string) => {
+                                            const user = allUsers.find(u => u.email === email);
+                                            return (
+                                                <div key={email} className="truncate">
+                                                    {user ? user.name : email}
+                                                </div>
+                                            );
+                                        })}
+                                        {memo.bcc.length > 3 && <div className="text-purple-400">+{memo.bcc.length - 3} more</div>}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -562,20 +757,35 @@ export function MemoDetail({ memo: initialMemo }: any) {
                                     {/* Right Side */}
                                     <div className="space-y-3 md:pl-6 border-t md:border-t-0 pt-3 md:pt-0 border-gray-200 border-dashed md:border-none">
                                         <div className="flex gap-2 text-sm">
-                                            <span className="font-bold min-w-[40px] text-gray-900">To:</span>
+                                            <span className="font-bold min-w-[65px] text-gray-900" title="Main Actionable Recipients">To:</span>
                                             <div className="flex flex-wrap gap-x-2 text-gray-800">
                                                 {Array.isArray(memo.to) ? memo.to.join(', ') : memo.to}
                                             </div>
                                         </div>
                                         <div className="flex gap-2 text-sm">
-                                            <span className="font-bold min-w-[40px] text-gray-900">Cc:</span>
+                                            <span className="font-bold min-w-[65px] text-gray-900" title="Carbon Copy (Information only)">Cc:</span>
                                             <span className="text-gray-800">
                                                 {Array.isArray(memo.cc) && memo.cc.length > 0 ? memo.cc.join(', ') : 'NA'}
                                             </span>
                                         </div>
+                                        {/* Bcc only visible to sender */}
+                                        {memo.from === session?.user?.email && Array.isArray(memo.bcc) && memo.bcc.length > 0 && (
+                                            <div className="flex gap-2 text-sm">
+                                                <span className="font-bold min-w-[65px] text-gray-900 italic text-blue-600" title="Blind Carbon Copy (Only you can see this)">Bcc:</span>
+                                                <span className="text-gray-500 italic">
+                                                    {memo.bcc.join(', ')}
+                                                </span>
+                                            </div>
+                                        )}
+                                        {memo.replyTo && (
+                                            <div className="flex gap-2 text-sm">
+                                                <span className="font-bold min-w-[65px] text-gray-900" title="Replies should go to this address">Reply-To:</span>
+                                                <span className="text-primary font-medium">{memo.replyTo}</span>
+                                            </div>
+                                        )}
                                         <div className="flex gap-2 text-sm">
-                                            <span className="font-bold min-w-[40px] text-gray-900">Ref:</span>
-                                            <span className="text-gray-800 uppercase font-mono tracking-tight text-xs bg-gray-100 px-1.5 py-0.5 rounded">
+                                            <span className="font-bold min-w-[65px] text-gray-900">Ref:</span>
+                                            <span className="text-gray-800 uppercase font-mono tracking-tight text-[10px] bg-gray-100 px-1.5 py-0.5 rounded">
                                                 UNIMED/{memo.fromDept || 'GENERAL'}/{new Date(memo.createdAt || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '')}/{String(memo._id).slice(-4)}
                                             </span>
                                         </div>
@@ -715,53 +925,191 @@ export function MemoDetail({ memo: initialMemo }: any) {
 
             {/* Forward Dialog */}
             <Dialog open={isForwardOpen} onOpenChange={setIsForwardOpen}>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>Forward Memo</DialogTitle>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Forward className="h-5 w-5 text-primary" />
+                            Forward Memo
+                        </DialogTitle>
                         <DialogDescription>
-                            Forward this document to another person or office.
+                            Forward this document to other staff members for action or awareness.
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="grid gap-4 py-4">
+                    <div className="grid gap-6 py-4">
+                        {/* Office Selector */}
                         <div className="grid gap-2">
-                            <Label htmlFor="recipient">Recipient (Person)</Label>
-                            <Input
-                                id="recipient"
-                                placeholder="Enter name of recipient"
-                                value={forwardForm.recipient}
-                                onChange={(e) => setForwardForm({ ...forwardForm, recipient: e.target.value })}
-                            />
-                        </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="office">Office</Label>
-                            <Input
-                                id="office"
-                                placeholder="Enter office/department"
+                            <Label htmlFor="office" className="text-xs font-bold uppercase text-gray-500">1. Filter by Office / Department</Label>
+                            <Select
                                 value={forwardForm.office}
-                                onChange={(e) => setForwardForm({ ...forwardForm, office: e.target.value })}
-                            />
+                                onValueChange={(val) => setForwardForm({ ...forwardForm, office: val })}
+                            >
+                                <SelectTrigger className="w-full bg-gray-50/50 text-gray-900">
+                                    <SelectValue placeholder="All Departments" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Departments</SelectItem>
+                                    {offices.map(office => (
+                                        <SelectItem key={office} value={office}>{office}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="message">Message</Label>
-                            <Textarea
-                                id="message"
-                                placeholder="Add a note..."
-                                value={forwardForm.message}
-                                onChange={(e) => setForwardForm({ ...forwardForm, message: e.target.value })}
-                            />
+
+                        {/* Recipients Section */}
+                        <div className="space-y-4 bg-gray-50/50 p-4 rounded-lg border border-gray-100">
+                            <div className="flex items-center justify-between">
+                                <Label className="text-xs font-bold uppercase text-gray-500">2. Select Recipients</Label>
+                                <div className="flex gap-2">
+                                    <Button variant="ghost" size="sm" onClick={() => setShowForwardCc(!showForwardCc)} className={cn("h-7 text-[10px]", showForwardCc ? "bg-primary/10 text-primary" : "text-gray-400")}>Cc</Button>
+                                    <Button variant="ghost" size="sm" onClick={() => setShowForwardBcc(!showForwardBcc)} className={cn("h-7 text-[10px]", showForwardBcc ? "bg-primary/10 text-primary" : "text-gray-400")}>Bcc</Button>
+                                    <Button variant="ghost" size="sm" onClick={() => setShowForwardReplyTo(!showForwardReplyTo)} className={cn("h-7 text-[10px]", showForwardReplyTo ? "bg-primary/10 text-primary" : "text-gray-400")}>Send To</Button>
+                                </div>
+                            </div>
+
+                            {/* TO */}
+                            <div className="space-y-2">
+                                <Label className="text-[11px] font-semibold text-gray-700">To (Expected to take action)</Label>
+                                <Select onValueChange={(val) => addForwardRecipient('toEmails', val)}>
+                                    <SelectTrigger className="bg-white border-gray-200">
+                                        <SelectValue placeholder="Add main recipient..." />
+                                    </SelectTrigger>
+                                    <SelectContent side="bottom" align="start" className="max-h-[300px]">
+                                        <SelectGroup>
+                                            <SelectLabel>Available Staff</SelectLabel>
+                                            {filteredUsers.map(u => (
+                                                <SelectItem key={u._id} value={u.email}>{u.name} ({u.designation})</SelectItem>
+                                            ))}
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                                {forwardForm.toEmails.length > 0 && (
+                                    <div className="flex flex-wrap gap-1.5 mt-2">
+                                        {forwardForm.toEmails.map(email => (
+                                            <Badge key={email} variant="secondary" className="bg-primary/10 text-primary border-primary/20 gap-1 pr-1">
+                                                {email}
+                                                <X className="h-3 w-3 cursor-pointer hover:text-red-500" onClick={() => removeForwardRecipient('toEmails', email)} />
+                                            </Badge>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* CC */}
+                            {showForwardCc && (
+                                <div className="space-y-2 animate-in fade-in duration-200">
+                                    <Label className="text-[11px] font-semibold text-gray-700">Cc (To be informed)</Label>
+                                    <Select onValueChange={(val) => addForwardRecipient('ccEmails', val)}>
+                                        <SelectTrigger className="bg-white border-gray-200">
+                                            <SelectValue placeholder="Add CC recipient..." />
+                                        </SelectTrigger>
+                                        <SelectContent side="bottom" align="start" className="max-h-[300px]">
+                                            {filteredUsers.map(u => (
+                                                <SelectItem key={u._id} value={u.email}>{u.name} ({u.designation})</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    {forwardForm.ccEmails.length > 0 && (
+                                        <div className="flex flex-wrap gap-1.5 mt-2">
+                                            {forwardForm.ccEmails.map(email => (
+                                                <Badge key={email} variant="secondary" className="bg-gray-100 text-gray-700 gap-1 pr-1">
+                                                    {email}
+                                                    <X className="h-3 w-3 cursor-pointer hover:text-red-500" onClick={() => removeForwardRecipient('ccEmails', email)} />
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* BCC */}
+                            {showForwardBcc && (
+                                <div className="space-y-2 animate-in fade-in duration-200">
+                                    <Label className="text-[11px] font-semibold text-gray-700">Bcc (Discreet awareness)</Label>
+                                    <Select onValueChange={(val) => addForwardRecipient('bccEmails', val)}>
+                                        <SelectTrigger className="bg-white border-gray-200">
+                                            <SelectValue placeholder="Add BCC recipient..." />
+                                        </SelectTrigger>
+                                        <SelectContent side="bottom" align="start" className="max-h-[300px]">
+                                            {filteredUsers.map(u => (
+                                                <SelectItem key={u._id} value={u.email}>{u.name} ({u.designation})</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    {forwardForm.bccEmails.length > 0 && (
+                                        <div className="flex flex-wrap gap-1.5 mt-2">
+                                            {forwardForm.bccEmails.map(email => (
+                                                <Badge key={email} variant="secondary" className="bg-gray-100/50 text-gray-500 italic gap-1 pr-1">
+                                                    {email}
+                                                    <X className="h-3 w-3 cursor-pointer hover:text-red-500" onClick={() => removeForwardRecipient('bccEmails', email)} />
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Send To */}
+                            {showForwardReplyTo && (
+                                <div className="space-y-2 animate-in fade-in duration-200">
+                                    <Label className="text-[11px] font-semibold text-gray-700">Send To (Where future replies should go)</Label>
+                                    <Input
+                                        placeholder="Specific email address..."
+                                        value={forwardForm.replyTo}
+                                        onChange={(e) => setForwardForm({ ...forwardForm, replyTo: e.target.value })}
+                                        className="bg-white border-gray-200"
+                                    />
+                                </div>
+                            )}
                         </div>
+
+                        {/* Notes Section */}
                         <div className="grid gap-2">
-                            <Label htmlFor="file">Attachment</Label>
-                            <Input
-                                id="file"
-                                type="file"
-                                onChange={(e) => setForwardForm({ ...forwardForm, file: e.target.files?.[0] || null })}
-                            />
+                            <Label htmlFor="message" className="text-xs font-bold uppercase text-gray-500">3. Add Forwarding Notes (Instruction)</Label>
+                            <div className="border border-gray-200 rounded-lg overflow-hidden bg-white min-h-[180px] text-gray-900">
+                                <div className="[&_.ql-editor]:text-gray-900 [&_.ql-editor]:min-h-[140px] [&_.ql-editor.ql-blank::before]:text-gray-400">
+                                    <ReactQuill
+                                        theme="snow"
+                                        value={forwardForm.message}
+                                        onChange={(val) => setForwardForm(prev => ({ ...prev, message: val }))}
+                                        placeholder="Enter your instruction or context for forwarding..."
+                                        modules={{
+                                            toolbar: [
+                                                ['bold', 'italic', 'underline'],
+                                                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                                ['clean']
+                                            ],
+                                        }}
+                                        className="h-[140px]"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* File Attachment */}
+                        <div className="grid gap-2">
+                            <Label htmlFor="file" className="text-xs font-bold uppercase text-gray-500">4. Attachment (Optional)</Label>
+                            <div className="flex items-center gap-2 p-2 border border-dashed border-gray-300 rounded-lg hover:border-primary/50 transition-colors cursor-pointer group bg-gray-50/50">
+                                <Label htmlFor="file-upload" className="flex items-center gap-2 cursor-pointer w-full">
+                                    <Paperclip className="h-4 w-4 text-gray-400 group-hover:text-primary" />
+                                    <span className="text-sm text-gray-500 group-hover:text-primary">
+                                        {forwardForm.file ? forwardForm.file.name : "Attach additional document..."}
+                                    </span>
+                                    <Input
+                                        id="file-upload"
+                                        type="file"
+                                        className="hidden"
+                                        onChange={(e) => setForwardForm({ ...forwardForm, file: e.target.files?.[0] || null })}
+                                    />
+                                </Label>
+                            </div>
                         </div>
                     </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsForwardOpen(false)}>Cancel</Button>
-                        <Button onClick={handleForwardSubmit}>Forward</Button>
+                    <DialogFooter className="bg-gray-50 -mx-6 -mb-6 p-6 mt-6 border-t border-gray-100">
+                        <Button variant="outline" onClick={() => setIsForwardOpen(false)} disabled={updating}>Cancel</Button>
+                        <Button onClick={handleForwardSubmit} className="gap-2" disabled={updating}>
+                            {updating ? <Clock className="h-4 w-4 animate-spin" /> : <Forward className="h-4 w-4" />}
+                            Forward Memo
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

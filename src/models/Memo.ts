@@ -7,6 +7,8 @@ export interface IMemo extends Document {
     fromDesignation: string;
     to: string[];
     cc: string[];
+    bcc: string[];
+    replyTo?: string;
     subject: string;
     sideNote?: string;
     recommender?: string[];
@@ -37,6 +39,8 @@ const MemoSchema: Schema = new Schema({
     fromDesignation: { type: String, required: true },
     to: [{ type: String, required: true }],
     cc: [{ type: String }],
+    bcc: [{ type: String }],
+    replyTo: { type: String },
     subject: { type: String, required: true },
     sideNote: { type: String },
     recommender: [{ type: String }],

@@ -6,12 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { Switch } from '@/components/ui/switch';
 import { ArrowLeft, Send, Save, CreditCard, Plus, X, Paperclip } from 'lucide-react';
 import { useUIStore } from '@/stores';
+import { cn } from '@/lib/utils';
 
 import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -29,11 +30,14 @@ import 'react-quill-new/dist/quill.snow.css';
 interface MemoFormData {
     to: string[];
     cc: string[];
+    bcc: string[];
+    replyTo: string;
     subject: string;
     sideNote: string;
     recommender: string[];
     approver: string[];
     message: string;
+    status: string;
     isFinancial: boolean;
     attachments: { name: string; url: string }[];
 }
@@ -47,11 +51,14 @@ export function ComposeMemo() {
     const [formData, setFormData] = useState<MemoFormData>({
         to: [],
         cc: [],
+        bcc: [],
+        replyTo: '',
         subject: '',
         sideNote: '',
         recommender: [],
         approver: [],
         message: '',
+        status: 'initiated',
         isFinancial: false,
         attachments: [],
     });
@@ -59,9 +66,12 @@ export function ComposeMemo() {
     const [loading, setLoading] = useState(!!memoId);
     const [toInput, setToInput] = useState('');
     const [ccInput, setCcInput] = useState('');
+    const [bccInput, setBccInput] = useState('');
     const [recommenderInput, setRecommenderInput] = useState('');
     const [approverInput, setApproverInput] = useState('');
     const [showCc, setShowCc] = useState(false);
+    const [showBcc, setShowBcc] = useState(false);
+    const [showReplyTo, setShowReplyTo] = useState(false);
 
     useEffect(() => {
         if (memoId) {
@@ -90,21 +100,47 @@ export function ComposeMemo() {
                 }
             };
             fetchMemo();
+        } else {
+            // Handle pre-filling from query params
+            const facultyName = searchParams.get('facultyName');
+            const departmentName = searchParams.get('departmentName');
+
+            if (facultyName || departmentName) {
+                const entityName = departmentName || facultyName;
+                setFormData(prev => ({
+                    ...prev,
+                    subject: `Regarding ${entityName}: `,
+                }));
+            }
         }
-    }, [memoId]);
+    }, [memoId, searchParams]);
 
-    // Mock users for Recommender/Approver
-    const mockUsers = [
-        { id: '1', email: 'hod.it@mcfin.com', name: 'Dr. Samuel Ojo (HOD IT)' },
-        { id: '2', email: 'dean.sci@mcfin.com', name: 'Prof. Alice Williams (Dean)' },
-        { id: '3', email: 'registrar@mcfin.com', name: 'Mrs. Janet Cole (Registrar)' },
-        { id: '4', email: 'vc@mcfin.com', name: 'Prof. Robert King (VC)' },
-    ];
+    const [allUsers, setAllUsers] = useState<any[]>([]);
+    const [userSearchLoading, setUserSearchLoading] = useState(false);
 
-    const addRecipient = (type: 'to' | 'cc' | 'recommender' | 'approver') => {
+    useEffect(() => {
+        const fetchUsers = async () => {
+            setUserSearchLoading(true);
+            try {
+                const res = await fetch('/api/users');
+                const data = await res.json();
+                if (data.success) {
+                    setAllUsers(data.data);
+                }
+            } catch (error) {
+                console.error("Error fetching users:", error);
+            } finally {
+                setUserSearchLoading(false);
+            }
+        };
+        fetchUsers();
+    }, []);
+
+    const addRecipient = (type: 'to' | 'cc' | 'bcc' | 'recommender' | 'approver') => {
         let input = '';
         if (type === 'to') input = toInput;
         else if (type === 'cc') input = ccInput;
+        else if (type === 'bcc') input = bccInput;
         else if (type === 'recommender') input = recommenderInput;
         else if (type === 'approver') input = approverInput;
 
@@ -125,11 +161,12 @@ export function ComposeMemo() {
 
         if (type === 'to') setToInput('');
         else if (type === 'cc') setCcInput('');
+        else if (type === 'bcc') setBccInput('');
         else if (type === 'recommender') setRecommenderInput('');
         else if (type === 'approver') setApproverInput('');
     };
 
-    const removeRecipient = (type: 'to' | 'cc' | 'recommender' | 'approver', email: string) => {
+    const removeRecipient = (type: 'to' | 'cc' | 'bcc' | 'recommender' | 'approver', email: string) => {
         setFormData({
             ...formData,
             [type]: formData[type].filter(e => e !== email)
@@ -316,39 +353,87 @@ export function ComposeMemo() {
                     <div className="space-y-4">
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                                <Label htmlFor="to" className="text-gray-900 font-semibold">To (Recipients)</Label>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => setShowCc(!showCc)}
-                                    className="text-xs text-primary hover:text-primary/80"
-                                >
-                                    {showCc ? '- Hide Cc' : '+ Add Cc'}
-                                </Button>
+                                <Label htmlFor="to" className="text-gray-900 font-semibold">To (Actionable Recipients)</Label>
+                                <div className="flex items-center gap-3">
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => setShowCc(!showCc)}
+                                        className={cn("text-xs transition-colors", showCc ? "text-primary" : "text-gray-500")}
+                                    >
+                                        Cc
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => setShowBcc(!showBcc)}
+                                        className={cn("text-xs transition-colors", showBcc ? "text-primary" : "text-gray-500")}
+                                    >
+                                        Bcc
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => setShowReplyTo(!showReplyTo)}
+                                        className={cn("text-xs transition-colors", showReplyTo ? "text-primary" : "text-gray-500")}
+                                    >
+                                        Reply-To
+                                    </Button>
+                                </div>
                             </div>
                             <div className="flex gap-2">
-                                <Input
-                                    id="to"
-                                    placeholder="Enter recipient email..."
-                                    value={toInput}
-                                    onChange={(e) => setToInput(e.target.value)}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
-                                            e.preventDefault();
-                                            addRecipient('to');
-                                        }
-                                    }}
-                                    className="bg-white border-gray-200 text-gray-900"
-                                />
-                                <Button
-                                    type="button"
-                                    onClick={() => addRecipient('to')}
-                                    variant="secondary"
-                                    className="shrink-0"
-                                >
-                                    Add
-                                </Button>
+                                <div className="flex-1 relative">
+                                    <Select
+                                        onValueChange={(val) => {
+                                            if (!formData.to.includes(val)) {
+                                                setFormData({ ...formData, to: [...formData.to, val] });
+                                            }
+                                        }}
+                                    >
+                                        <SelectTrigger className="bg-white border-gray-200 text-gray-900">
+                                            <SelectValue placeholder="Search or select recipient..." />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectLabel>Available Staff</SelectLabel>
+                                                {allUsers.map((user) => (
+                                                    <SelectItem key={user._id} value={user.email}>
+                                                        <div className="flex flex-col">
+                                                            <span className="font-medium">{user.name}</span>
+                                                            <span className="text-[10px] text-gray-500 uppercase">{user.designation} - {user.department}</span>
+                                                        </div>
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="flex-[0.5] flex gap-2">
+                                    <Input
+                                        id="to-manual"
+                                        placeholder="Or type email..."
+                                        value={toInput}
+                                        onChange={(e) => setToInput(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                                addRecipient('to');
+                                            }
+                                        }}
+                                        className="bg-white border-gray-200 text-gray-900"
+                                    />
+                                    <Button
+                                        type="button"
+                                        onClick={() => addRecipient('to')}
+                                        variant="secondary"
+                                        className="shrink-0"
+                                    >
+                                        Add
+                                    </Button>
+                                </div>
                             </div>
                             {formData.to.length > 0 && (
                                 <div className="flex flex-wrap gap-2 mt-2">
@@ -374,29 +459,54 @@ export function ComposeMemo() {
                         {/* Cc */}
                         {showCc && (
                             <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
-                                <Label htmlFor="cc" className="text-gray-900 font-semibold">Cc</Label>
+                                <Label htmlFor="cc" className="text-gray-900 font-semibold">Cc (Informational)</Label>
                                 <div className="flex gap-2">
-                                    <Input
-                                        id="cc"
-                                        placeholder="Enter Cc email..."
-                                        value={ccInput}
-                                        onChange={(e) => setCcInput(e.target.value)}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                e.preventDefault();
-                                                addRecipient('cc');
-                                            }
-                                        }}
-                                        className="bg-white border-gray-200 text-gray-900"
-                                    />
-                                    <Button
-                                        type="button"
-                                        onClick={() => addRecipient('cc')}
-                                        variant="secondary"
-                                        className="shrink-0"
-                                    >
-                                        Add
-                                    </Button>
+                                    <div className="flex-1 relative">
+                                        <Select
+                                            onValueChange={(val) => {
+                                                if (!formData.cc.includes(val)) {
+                                                    setFormData({ ...formData, cc: [...formData.cc, val] });
+                                                }
+                                            }}
+                                        >
+                                            <SelectTrigger className="bg-white border-gray-200 text-gray-900">
+                                                <SelectValue placeholder="Add from staff list..." />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectLabel>Staff</SelectLabel>
+                                                    {allUsers.map((user) => (
+                                                        <SelectItem key={user._id} value={user.email}>
+                                                            {user.name} ({user.email})
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="flex-[0.5] flex gap-2">
+                                        <Input
+                                            id="cc-manual"
+                                            placeholder="Manual Cc..."
+                                            value={ccInput}
+                                            onChange={(e) => setCcInput(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault();
+                                                    addRecipient('cc');
+                                                }
+                                            }}
+                                            className="bg-white border-gray-200 text-gray-900"
+                                        />
+                                        <Button
+                                            type="button"
+                                            onClick={() => addRecipient('cc')}
+                                            variant="secondary"
+                                            className="shrink-0"
+                                        >
+                                            Add
+                                        </Button>
+                                    </div>
                                 </div>
                                 {formData.cc.length > 0 && (
                                     <div className="flex flex-wrap gap-2 mt-2">
@@ -417,6 +527,96 @@ export function ComposeMemo() {
                                         ))}
                                     </div>
                                 )}
+                            </div>
+                        )}
+
+                        {/* Bcc */}
+                        {showBcc && (
+                            <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                                <Label htmlFor="bcc" className="text-gray-900 font-semibold">Bcc (Discreet awareness)</Label>
+                                <div className="flex gap-2">
+                                    <div className="flex-1 relative">
+                                        <Select
+                                            onValueChange={(val) => {
+                                                if (!formData.bcc.includes(val)) {
+                                                    setFormData({ ...formData, bcc: [...formData.bcc, val] });
+                                                }
+                                            }}
+                                        >
+                                            <SelectTrigger className="bg-white border-gray-200 text-gray-900">
+                                                <SelectValue placeholder="Add from staff list..." />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectLabel>Staff</SelectLabel>
+                                                    {allUsers.map((user) => (
+                                                        <SelectItem key={user._id} value={user.email}>
+                                                            {user.name} ({user.email})
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="flex-[0.5] flex gap-2">
+                                        <Input
+                                            id="bcc-manual"
+                                            placeholder="Manual Bcc..."
+                                            value={bccInput}
+                                            onChange={(e) => setBccInput(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault();
+                                                    addRecipient('bcc');
+                                                }
+                                            }}
+                                            className="bg-white border-gray-200 text-gray-900"
+                                        />
+                                        <Button
+                                            type="button"
+                                            onClick={() => addRecipient('bcc')}
+                                            variant="secondary"
+                                            className="shrink-0"
+                                        >
+                                            Add
+                                        </Button>
+                                    </div>
+                                </div>
+                                {formData.bcc.length > 0 && (
+                                    <div className="flex flex-wrap gap-2 mt-2">
+                                        {formData.bcc.map((email) => (
+                                            <div
+                                                key={email}
+                                                className="flex items-center gap-1 bg-gray-100 text-gray-700 border border-gray-200 px-2 py-1 rounded-full text-xs font-medium"
+                                            >
+                                                {email}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeRecipient('bcc', email)}
+                                                    className="ml-1 hover:bg-gray-200 rounded-full p-0.5"
+                                                >
+                                                    <X className="h-3 w-3" />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Reply-To */}
+                        {showReplyTo && (
+                            <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                                <Label htmlFor="replyTo" className="text-gray-900 font-semibold text-xs">Reply-To (Where replies should go)</Label>
+                                <div className="flex gap-2">
+                                    <Input
+                                        id="replyTo"
+                                        placeholder="Specific email for replies (optional)..."
+                                        value={formData.replyTo}
+                                        onChange={(e) => setFormData({ ...formData, replyTo: e.target.value })}
+                                        className="bg-white border-gray-200 text-gray-900"
+                                    />
+                                </div>
                             </div>
                         )}
                     </div>
@@ -467,9 +667,27 @@ export function ComposeMemo() {
                             <Label htmlFor="recommender" className="text-gray-900 font-semibold">Recommenders</Label>
                             <div className="flex gap-2">
                                 <div className="flex-1 relative">
+                                    <Select
+                                        onValueChange={(val) => {
+                                            if (!formData.recommender.includes(val)) {
+                                                setFormData({ ...formData, recommender: [...formData.recommender, val] });
+                                            }
+                                        }}
+                                    >
+                                        <SelectTrigger className="bg-white border-gray-200">
+                                            <SelectValue placeholder="Select high-level staff..." />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {allUsers.map((user) => (
+                                                <SelectItem key={user._id} value={user.email}>{user.name} ({user.designation})</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="flex-[0.5] flex gap-2">
                                     <Input
-                                        id="recommender"
-                                        placeholder="Add recommender email..."
+                                        id="recommender-manual"
+                                        placeholder="Or type email..."
                                         value={recommenderInput}
                                         onChange={(e) => setRecommenderInput(e.target.value)}
                                         onKeyDown={(e) => {
@@ -480,34 +698,15 @@ export function ComposeMemo() {
                                         }}
                                         className="bg-white border-gray-200 text-gray-900"
                                     />
-                                    {recommenderInput && (
-                                        <div className="absolute top-full left-0 w-full z-20 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg">
-                                            {mockUsers.filter(u => u.email.toLowerCase().includes(recommenderInput.toLowerCase())).map(user => (
-                                                <button
-                                                    key={user.id}
-                                                    type="button"
-                                                    className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
-                                                    onClick={() => {
-                                                        if (!formData.recommender.includes(user.email)) {
-                                                            setFormData({ ...formData, recommender: [...formData.recommender, user.email] });
-                                                        }
-                                                        setRecommenderInput('');
-                                                    }}
-                                                >
-                                                    {user.name} ({user.email})
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
+                                    <Button
+                                        type="button"
+                                        onClick={() => addRecipient('recommender')}
+                                        variant="secondary"
+                                        className="shrink-0"
+                                    >
+                                        Add
+                                    </Button>
                                 </div>
-                                <Button
-                                    type="button"
-                                    onClick={() => addRecipient('recommender')}
-                                    variant="secondary"
-                                    className="shrink-0"
-                                >
-                                    Add
-                                </Button>
                             </div>
                             {formData.recommender.length > 0 && (
                                 <div className="flex flex-wrap gap-2 mt-2">
@@ -535,9 +734,27 @@ export function ComposeMemo() {
                             <Label htmlFor="approver" className="text-gray-900 font-semibold">Approvers</Label>
                             <div className="flex gap-2">
                                 <div className="flex-1 relative">
+                                    <Select
+                                        onValueChange={(val) => {
+                                            if (!formData.approver.includes(val)) {
+                                                setFormData({ ...formData, approver: [...formData.approver, val] });
+                                            }
+                                        }}
+                                    >
+                                        <SelectTrigger className="bg-white border-gray-200">
+                                            <SelectValue placeholder="Select approver (e.g. Registrar, VC)..." />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {allUsers.map((user) => (
+                                                <SelectItem key={user._id} value={user.email}>{user.name} ({user.designation})</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="flex-[0.5] flex gap-2">
                                     <Input
-                                        id="approver"
-                                        placeholder="Add approver email..."
+                                        id="approver-manual"
+                                        placeholder="Or type email..."
                                         value={approverInput}
                                         onChange={(e) => setApproverInput(e.target.value)}
                                         onKeyDown={(e) => {
@@ -548,34 +765,15 @@ export function ComposeMemo() {
                                         }}
                                         className="bg-white border-gray-200 text-gray-900"
                                     />
-                                    {approverInput && (
-                                        <div className="absolute top-full left-0 w-full z-20 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg">
-                                            {mockUsers.filter(u => u.email.toLowerCase().includes(approverInput.toLowerCase())).map(user => (
-                                                <button
-                                                    key={user.id}
-                                                    type="button"
-                                                    className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
-                                                    onClick={() => {
-                                                        if (!formData.approver.includes(user.email)) {
-                                                            setFormData({ ...formData, approver: [...formData.approver, user.email] });
-                                                        }
-                                                        setApproverInput('');
-                                                    }}
-                                                >
-                                                    {user.name} ({user.email})
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
+                                    <Button
+                                        type="button"
+                                        onClick={() => addRecipient('approver')}
+                                        variant="secondary"
+                                        className="shrink-0"
+                                    >
+                                        Add
+                                    </Button>
                                 </div>
-                                <Button
-                                    type="button"
-                                    onClick={() => addRecipient('approver')}
-                                    variant="secondary"
-                                    className="shrink-0"
-                                >
-                                    Add
-                                </Button>
                             </div>
                             {formData.approver.length > 0 && (
                                 <div className="flex flex-wrap gap-2 mt-2">
