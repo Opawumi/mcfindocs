@@ -16,6 +16,8 @@ import {
   getDocumentById,
 } from "../lib/mock-data";
 import { sleep } from "../lib/utils";
+import dbConnect from "@/lib/db";
+import Memo from "@/models/Memo";
 
 /**
  * Document Service
@@ -33,7 +35,19 @@ export async function getDocuments(
 ): Promise<PaginatedResult<Document>> {
   await sleep(300); // Simulate network delay
 
+  // For now, let's mix real memos into documents if we want, or keeps separate.
+  // The user asked for "Recent Activity" mostly.
+  // Getting full list of documents from Memos + others is complex.
+  // Let's stick to mock for the main list unless requested, but update the "Activity" and "Counts".
   let filteredDocuments = [...mockDocuments];
+
+  // ... (rest of getDocuments logic kept as is for now or implied)
+  // To avoid replacing the whole file, I will just return the original file content for this part if I can't target cleanly.
+  // Actually, I'll just change the imports and the specific functions I need.
+
+  // Returning control to tool use... 
+  // I will just add the imports now.
+
 
   // Apply filters
   if (filters) {
@@ -294,26 +308,58 @@ export async function downloadDocument(id: string): Promise<void> {
  * Get total documents count
  */
 export async function getTotalDocumentsCount(): Promise<number> {
-  await sleep(200);
-  return mockDocuments.length;
+  await dbConnect();
+  return Memo.countDocuments({});
 }
 
 /**
  * Get shared documents count
  */
 export async function getSharedDocumentsCount(userId: string): Promise<number> {
-  await sleep(200);
-  return mockDocuments.filter(doc => 
-    doc.sharedWith?.some(share => share.userId === userId)
-  ).length;
+  await dbConnect();
+  // We assume userId is the email here
+  return Memo.countDocuments({
+    $and: [
+      { from: { $ne: userId } }, // Not sent by me
+      { $or: [{ to: userId }, { cc: userId }] } // Sent to me or CC'd
+    ]
+  });
 }
 
 /**
  * Get recent activity
  */
 export async function getRecentActivity(limit: number = 5): Promise<Document[]> {
-  await sleep(300);
-  return [...mockDocuments]
-    .sort((a, b) => new Date(b.lastModifiedAt).getTime() - new Date(a.lastModifiedAt).getTime())
-    .slice(0, limit);
+  await dbConnect();
+
+  const memos = await Memo.find({})
+    .sort({ updatedAt: -1 })
+    .limit(limit)
+    .lean();
+
+  return memos.map((memo: any) => ({
+    id: memo._id.toString(),
+    name: memo.subject, // Map subject to name
+    fileName: `${memo.subject}.memo`, // Synthetic filename
+    fileSize: memo.message ? memo.message.length * 2 : 0, // Approx size
+    fileType: 'memo',
+    fileUrl: `/dashboard/memos/inbox/${memo._id}`, // Navigate to detail
+    categoryId: 'memos',
+    folderId: 'inbox',
+    metadata: {
+      title: memo.subject,
+      description: memo.message ? memo.message.substring(0, 100) : '',
+      createdAt: new Date(memo.createdAt).toISOString(),
+      updatedAt: new Date(memo.updatedAt).toISOString()
+    },
+    status: memo.status === 'approved' ? 'published' : 'draft',
+    currentVersion: 1,
+    uploadedBy: memo.fromName || memo.from, // Show sender
+    uploadedAt: new Date(memo.createdAt).toISOString(),
+    lastModifiedBy: memo.approvedByName || memo.fromName || memo.from,
+    lastModifiedAt: new Date(memo.updatedAt).toISOString(),
+    viewCount: 0,
+    downloadCount: 0,
+    isShared: (memo.to && memo.to.length > 1) || (memo.cc && memo.cc.length > 0)
+  }));
 }

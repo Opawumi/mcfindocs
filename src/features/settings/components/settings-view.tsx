@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useRef } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,10 +12,176 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { ArrowLeft, User, Bell, Lock, Globe, Moon } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
+import { useSession } from 'next-auth/react';
+import { toast } from 'sonner';
+import { getInitials } from '@/lib/utils';
 
 export function SettingsView() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const { data: session, update } = useSession();
     const [activeTab, setActiveTab] = useState('profile');
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Profile State
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [department, setDepartment] = useState('');
+    const [designation, setDesignation] = useState('');
+    const [bio, setBio] = useState(''); // Not persisted yet but mocked
+    const [isProfileLoading, setProfileLoading] = useState(false);
+    const [isImageUploading, setImageUploading] = useState(false);
+
+    // Other state...
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [isSecurityLoading, setSecurityLoading] = useState(false);
+
+    // ... (rest of effects)
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (file.size > 1024 * 1024) { // 1MB
+            toast.error("Image size must be less than 1MB");
+            return;
+        }
+
+        setImageUploading(true);
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            const base64Image = reader.result as string;
+            try {
+                const res = await fetch('/api/users/profile', {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image: base64Image })
+                });
+
+                const result = await res.json();
+                if (result.success) {
+                    // Update session with new avatar URL (with timestamp to bust cache)
+                    const userId = (session?.user as any)?.id;
+                    const newAvatarUrl = `/api/users/${userId}/avatar?t=${Date.now()}`;
+
+                    await update({
+                        ...session,
+                        user: {
+                            ...session?.user,
+                            image: newAvatarUrl
+                        }
+                    });
+
+                    toast.success('Profile picture updated');
+                } else {
+                    toast.error('Failed to update profile picture');
+                }
+            } catch (error) {
+                toast.error('An error occurred');
+            } finally {
+                setImageUploading(false);
+            }
+        };
+        reader.readAsDataURL(file);
+    };
+
+    // ... (rest of handlers)
+
+    useEffect(() => {
+        const tab = searchParams.get('tab');
+        if (tab) setActiveTab(tab);
+    }, [searchParams]);
+
+    useEffect(() => {
+        if (session?.user) {
+            const user = session.user as any;
+            const names = (user.name || '').split(' ');
+            if (names.length > 0) setFirstName(names[0]);
+            if (names.length > 1) setLastName(names.slice(1).join(' '));
+            setDepartment(user.department || '');
+            setDesignation(user.designation || '');
+        }
+    }, [session]);
+
+    const user = session?.user as any;
+
+    const handleProfileSave = async () => {
+        setProfileLoading(true);
+        try {
+            const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
+            const res = await fetch('/api/users/profile', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: fullName,
+                    department,
+                    designation
+                })
+            });
+
+            const result = await res.json();
+
+            if (result.success) {
+                // Update session client-side
+                await update({
+                    ...session,
+                    user: {
+                        ...session?.user,
+                        name: fullName,
+                        department,
+                        designation
+                    }
+                });
+                toast.success('Profile updated successfully');
+            } else {
+                toast.error(result.error || 'Failed to update profile');
+            }
+        } catch (error) {
+            toast.error('An error occurred');
+        } finally {
+            setProfileLoading(false);
+        }
+    };
+
+    const handlePasswordUpdate = async () => {
+        if (newPassword !== confirmPassword) {
+            toast.error("New passwords don't match");
+            return;
+        }
+        if (newPassword.length < 6) {
+            toast.error("Password must be at least 6 characters");
+            return;
+        }
+
+        setSecurityLoading(true);
+        try {
+            const res = await fetch('/api/users/password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    currentPassword,
+                    newPassword
+                })
+            });
+
+            const result = await res.json();
+
+            if (result.success) {
+                toast.success('Password updated successfully');
+                setCurrentPassword('');
+                setNewPassword('');
+                setConfirmPassword('');
+            } else {
+                toast.error(result.error || 'Failed to update password');
+            }
+        } catch (error) {
+            toast.error('An error occurred');
+        } finally {
+            setSecurityLoading(false);
+        }
+    };
 
     return (
         <div className="space-y-6 pb-12">
@@ -35,7 +201,7 @@ export function SettingsView() {
                 </div>
             </div>
 
-            <Tabs defaultValue="profile" className="w-full" onValueChange={setActiveTab}>
+            <Tabs value={activeTab} className="w-full" onValueChange={setActiveTab}>
                 <div className="flex flex-col md:flex-row gap-6">
                     {/* Sidebar for Tabs */}
                     <aside className="w-full md:w-64 space-y-4">
@@ -83,35 +249,88 @@ export function SettingsView() {
                                 <CardContent className="space-y-6">
                                     <div className="flex items-center gap-6">
                                         <Avatar className="h-20 w-20">
-                                            <AvatarImage src="https://github.com/shadcn.png" />
-                                            <AvatarFallback>CN</AvatarFallback>
+                                            <AvatarImage src={user?.image} />
+                                            <AvatarFallback className="text-2xl bg-primary text-white">
+                                                {getInitials(user?.name || 'U')}
+                                            </AvatarFallback>
                                         </Avatar>
-                                        <Button variant="outline" className="text-gray-900 border-gray-300">Change Photo</Button>
+                                        <div className="space-y-2">
+                                            <input
+                                                type="file"
+                                                ref={fileInputRef}
+                                                className="hidden"
+                                                accept="image/*"
+                                                onChange={handleImageUpload}
+                                            />
+                                            <Button
+                                                variant="outline"
+                                                className="text-gray-900 border-gray-300"
+                                                onClick={() => fileInputRef.current?.click()}
+                                                disabled={isImageUploading}
+                                            >
+                                                {isImageUploading ? 'Uploading...' : 'Change Photo'}
+                                            </Button>
+                                            <p className="text-xs text-gray-500">JPG, GIF or PNG. Max 1MB.</p>
+                                        </div>
                                     </div>
 
                                     <div className="grid gap-4 md:grid-cols-2">
                                         <div className="space-y-2">
                                             <Label htmlFor="firstName" className="text-gray-900">First name</Label>
-                                            <Input id="firstName" defaultValue="John" className="bg-white border-gray-300 text-gray-900" />
+                                            <Input
+                                                id="firstName"
+                                                value={firstName}
+                                                onChange={(e) => setFirstName(e.target.value)}
+                                                className="bg-white border-gray-300 text-gray-900"
+                                            />
                                         </div>
                                         <div className="space-y-2">
                                             <Label htmlFor="lastName" className="text-gray-900">Last name</Label>
-                                            <Input id="lastName" defaultValue="Doe" className="bg-white border-gray-300 text-gray-900" />
+                                            <Input
+                                                id="lastName"
+                                                value={lastName}
+                                                onChange={(e) => setLastName(e.target.value)}
+                                                className="bg-white border-gray-300 text-gray-900"
+                                            />
                                         </div>
                                     </div>
 
-                                    <div className="space-y-2">
-                                        <Label htmlFor="email" className="text-gray-900">Email</Label>
-                                        <Input id="email" defaultValue="john.doe@example.com" className="bg-white border-gray-300 text-gray-900" />
+                                    <div className="grid gap-4 md:grid-cols-2">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="email" className="text-gray-900">Email</Label>
+                                            <Input id="email" defaultValue={user?.email} disabled className="bg-gray-50 border-gray-300 text-gray-500 cursor-not-allowed" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="role" className="text-gray-900">Role</Label>
+                                            <Input id="role" defaultValue={user?.role} disabled className="bg-gray-50 border-gray-300 text-gray-500 capitalize cursor-not-allowed" />
+                                        </div>
                                     </div>
 
-                                    <div className="space-y-2">
-                                        <Label htmlFor="bio" className="text-gray-900">Bio</Label>
-                                        <Textarea id="bio" placeholder="Write a short bio..." className="bg-white border-gray-300 text-gray-900 resize-none min-h-[100px]" />
+                                    <div className="grid gap-4 md:grid-cols-2">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="dept" className="text-gray-900">Department</Label>
+                                            <Input
+                                                id="dept"
+                                                value={department}
+                                                onChange={(e) => setDepartment(e.target.value)}
+                                                className="bg-white border-gray-300 text-gray-900"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="designation" className="text-gray-900">Designation</Label>
+                                            <Input
+                                                id="designation"
+                                                value={designation}
+                                                onChange={(e) => setDesignation(e.target.value)}
+                                                className="bg-white border-gray-300 text-gray-900"
+                                            />
+                                        </div>
                                     </div>
                                 </CardContent>
                                 <CardFooter>
-                                    <Button className="bg-primary hover:bg-primary/90">Save Changes</Button>
+                                    <Button onClick={handleProfileSave} disabled={isProfileLoading} className="bg-primary hover:bg-primary/90">
+                                        {isProfileLoading ? 'Saving...' : 'Save Changes'}
+                                    </Button>
                                 </CardFooter>
                             </Card>
                         </TabsContent>
@@ -167,19 +386,39 @@ export function SettingsView() {
                                 <CardContent className="space-y-6">
                                     <div className="space-y-2">
                                         <Label htmlFor="current" className="text-gray-900">Current Password</Label>
-                                        <Input id="current" type="password" className="bg-white border-gray-300 text-gray-900" />
+                                        <Input
+                                            id="current"
+                                            type="password"
+                                            value={currentPassword}
+                                            onChange={(e) => setCurrentPassword(e.target.value)}
+                                            className="bg-white border-gray-300 text-gray-900"
+                                        />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="new" className="text-gray-900">New Password</Label>
-                                        <Input id="new" type="password" className="bg-white border-gray-300 text-gray-900" />
+                                        <Input
+                                            id="new"
+                                            type="password"
+                                            value={newPassword}
+                                            onChange={(e) => setNewPassword(e.target.value)}
+                                            className="bg-white border-gray-300 text-gray-900"
+                                        />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="confirm" className="text-gray-900">Confirm Password</Label>
-                                        <Input id="confirm" type="password" className="bg-white border-gray-300 text-gray-900" />
+                                        <Input
+                                            id="confirm"
+                                            type="password"
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            className="bg-white border-gray-300 text-gray-900"
+                                        />
                                     </div>
                                 </CardContent>
                                 <CardFooter>
-                                    <Button className="bg-primary hover:bg-primary/90">Update Password</Button>
+                                    <Button onClick={handlePasswordUpdate} disabled={isSecurityLoading} className="bg-primary hover:bg-primary/90">
+                                        {isSecurityLoading ? 'Updating...' : 'Update Password'}
+                                    </Button>
                                 </CardFooter>
                             </Card>
                         </TabsContent>

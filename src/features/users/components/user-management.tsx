@@ -109,10 +109,20 @@ export function UserManagement() {
                         <p className="text-sm text-gray-500">Manage system users and access roles</p>
                     </div>
                 </div>
-                <Button className="bg-primary hover:bg-primary/90 text-white gap-2">
-                    <UserPlus className="h-4 w-4" />
-                    Add User
-                </Button>
+                <div className="flex items-center gap-3">
+                    <Button
+                        variant="outline"
+                        className="gap-2"
+                        onClick={() => router.push('/dashboard/admin/roles')}
+                    >
+                        <Shield className="h-4 w-4" />
+                        Roles & Permissions
+                    </Button>
+                    <Button className="bg-primary hover:bg-primary/90 text-white gap-2">
+                        <UserPlus className="h-4 w-4" />
+                        Add User
+                    </Button>
+                </div>
             </div>
 
             {/* Filters */}

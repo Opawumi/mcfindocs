@@ -5,12 +5,21 @@ import {
 } from "@/services/document.service";
 import { getMyFoldersCount } from "@/services/folder.service";
 import { getUnreadCount } from "@/services/memo.service";
-import { getCurrentUser } from "@/lib/mock-data/users.mock";
 import { formatRelativeTime } from "@/lib/utils";
 import { FileText, Folder, Mail, Share2, File as FileIcon } from "lucide-react";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import Link from "next/link";
 
 export default async function DashboardPage() {
-  const currentUser = getCurrentUser();
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.email) {
+    redirect('/login');
+  }
+
+  const userEmail = session.user.email;
 
   // Fetch data in parallel
   const [
@@ -21,9 +30,9 @@ export default async function DashboardPage() {
     recentDocuments
   ] = await Promise.all([
     getTotalDocumentsCount(),
-    getMyFoldersCount(currentUser.id),
-    getUnreadCount(currentUser.id),
-    getSharedDocumentsCount(currentUser.id),
+    getMyFoldersCount(userEmail),
+    getUnreadCount(userEmail),
+    getSharedDocumentsCount(userEmail),
     getRecentActivity(5)
   ]);
 
@@ -100,24 +109,30 @@ export default async function DashboardPage() {
         <div className="divide-y divide-gray-100">
           {recentDocuments.length > 0 ? (
             recentDocuments.map((doc) => (
-              <div key={doc.id} className="flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
-                <div className="flex items-center space-x-4">
-                  <div className="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
-                    <FileIcon className="h-5 w-5 text-gray-500" />
+              <Link
+                key={doc.id}
+                href={doc.fileUrl || '#'}
+                className="block hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center justify-between p-6">
+                  <div className="flex items-center space-x-4">
+                    <div className="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                      <FileIcon className="h-5 w-5 text-gray-500" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-900">{doc.name}</h3>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        Modified {formatRelativeTime(doc.lastModifiedAt)} by {doc.lastModifiedBy}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-900">{doc.name}</h3>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      Modified {formatRelativeTime(doc.lastModifiedAt)} by {doc.lastModifiedBy}
-                    </p>
+                  <div className="flex items-center space-x-4">
+                    <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">
+                      {doc.fileType}
+                    </span>
                   </div>
                 </div>
-                <div className="flex items-center space-x-4">
-                  <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">
-                    {doc.fileType}
-                  </span>
-                </div>
-              </div>
+              </Link>
             ))
           ) : (
             <div className="p-6 text-center text-sm text-gray-500">

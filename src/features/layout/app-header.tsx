@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 import { Search, Bell, User, Settings, LogOut } from 'lucide-react';
 import { useSession, signOut } from 'next-auth/react';
 import { useUIStore } from '@/stores';
@@ -168,13 +169,17 @@ export function AppHeader() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer">
-              <User className="mr-2 h-4 w-4 text-gray-600" />
-              <span className="text-gray-700">Profile</span>
+            <DropdownMenuItem asChild>
+              <Link href="/dashboard/profile" className="flex w-full cursor-pointer items-center">
+                <User className="mr-2 h-4 w-4 text-gray-600" />
+                <span className="text-gray-700">Profile</span>
+              </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">
-              <Settings className="mr-2 h-4 w-4 text-gray-600" />
-              <span className="text-gray-700">Settings</span>
+            <DropdownMenuItem asChild>
+              <Link href="/dashboard/settings" className="flex w-full cursor-pointer items-center">
+                <Settings className="mr-2 h-4 w-4 text-gray-600" />
+                <span className="text-gray-700">Settings</span>
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout} className="text-red-600 cursor-pointer">

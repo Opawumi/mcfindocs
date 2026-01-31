@@ -114,6 +114,23 @@ Generated: 2026-01-15
 
 ---
 
+## WEEK 4 TASKS: User Access right and definitions
+
+### ✅ COMPLETED TASKS:
+
+#### 1. **User Access Rights & Definitions** - ✅ FULLY IMPLEMENTED
+   - **Centralized Configuration**:
+     - Defined `ROLE_PERMISSIONS` mapping for Super Admin, Admin, General User, and Guest
+     - Created readable labels and descriptions for all roles and permissions
+   - **Developer Tools**:
+     - Created `usePermissions` hook for easy role/permission checking in components
+   - **Visualization**:
+     - Created "User Access Rights & Definitions" page (`/dashboard/admin/roles`)
+     - Implemented a detailed matrix table showing exactly which role has which permission
+     - Added navigation from User Management page
+
+---
+
 ## SUMMARY
 
 ### Overall Completion Status:
@@ -130,6 +147,11 @@ Generated: 2026-01-15
 - ⚠️ Document Downloading: 70% (needs backend)
 - ❌ Document Approvals: 0%
 - ⚠️ Document Tracking: 50%
+
+**Week 4: ~100% Complete**
+- ✅ User Access Rights Definitions: 100%
+- ✅ Roles & Permissions Visualization: 100%
+- ✅ Permission Verification Hooks: 100%
 
 ### Critical Missing Components:
 

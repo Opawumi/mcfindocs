@@ -119,14 +119,60 @@ export function MemoDetail({ memo: initialMemo }: any) {
             return;
         }
 
+        const currentUser = session?.user as any;
+        if (!currentUser) {
+            toast.error('You must be logged in to forward memos');
+            return;
+        }
+
         setUpdating(true);
         try {
-            // In a real app, this would hit /api/memos/forward
-            // For now, simulator success
-            toast.success(`Memo forwarded successfully`);
-            setIsForwardOpen(false);
-            setForwardForm({ toEmails: [], ccEmails: [], bccEmails: [], replyTo: '', office: '', message: '', file: null });
+            // Construct forwarded body
+            const forwardedHeader = `
+
+---------- Forwarded message ----------
+From: ${memo.fromName} <${memo.from}>
+Date: ${new Date(memo.createdAt || Date.now()).toLocaleString()}
+Subject: ${memo.subject}
+To: ${Array.isArray(memo.to) ? memo.to.join(', ') : memo.to}
+`;
+
+            const fullMessage = (forwardForm.message || '') + forwardedHeader + `\n\n${memo.message}`;
+            const newSubject = memo.subject.startsWith('Fwd:') ? memo.subject : `Fwd: ${memo.subject}`;
+
+            const payload = {
+                from: currentUser.email,
+                fromName: currentUser.name || 'Unknown',
+                fromDept: currentUser.department || 'General',
+                fromDesignation: currentUser.designation || 'Staff',
+                to: forwardForm.toEmails,
+                cc: forwardForm.ccEmails,
+                bcc: forwardForm.bccEmails,
+                replyTo: forwardForm.replyTo,
+                subject: newSubject,
+                message: fullMessage,
+                status: 'pending', // Forwarded memos typically go to pending/inbox
+                date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                isFinancial: memo.isFinancial // Carry over financial flag? Maybe
+            };
+
+            const res = await fetch('/api/memos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await res.json();
+
+            if (result.success) {
+                toast.success(`Memo forwarded successfully`);
+                setIsForwardOpen(false);
+                setForwardForm({ toEmails: [], ccEmails: [], bccEmails: [], replyTo: '', office: '', message: '', file: null });
+            } else {
+                toast.error(result.error || 'Failed to forward memo');
+            }
         } catch (error) {
+            console.error('Forward Error:', error);
             toast.error('Failed to forward memo');
         } finally {
             setUpdating(false);
@@ -511,21 +557,50 @@ export function MemoDetail({ memo: initialMemo }: any) {
                             {memo.approver.map((approverEmail: string, index: number) => {
                                 const approverUser = allUsers.find(u => u.email === approverEmail);
                                 const isLast = index === memo.approver.length - 1;
-                                const isApproved = memo.status === 'approved';
+
+                                // Check if this approver has taken any action
+                                const userMinute = memo.minutes?.find((m: any) => m.authorEmail === approverEmail);
+                                const status = userMinute?.status; // 'approved' | 'rejected' | 'comment'
+
+                                let statusColor = "bg-orange-50 border-orange-200 text-orange-700";
+                                let Icon = User;
+                                let badge = null;
+
+                                if (status === 'approved') {
+                                    statusColor = "bg-green-100 border-green-300 text-green-700";
+                                    Icon = CheckCircle2;
+                                    badge = <Badge className="bg-green-100 text-green-700 border-green-200 text-[8px] px-1 py-0 ml-1">APPROVED</Badge>;
+                                } else if (status === 'rejected') {
+                                    statusColor = "bg-red-100 border-red-300 text-red-700";
+                                    Icon = X;
+                                    badge = <Badge className="bg-red-100 text-red-700 border-red-200 text-[8px] px-1 py-0 ml-1">REJECTED</Badge>;
+                                } else if (status === 'comment') {
+                                    statusColor = "bg-blue-50 border-blue-200 text-blue-700";
+                                    Icon = FileText;
+                                    badge = <Badge className="bg-blue-100 text-blue-700 border-blue-200 text-[8px] px-1 py-0 ml-1">COMMENTED</Badge>;
+                                } else if (memo.status === 'approved' && !userMinute && index === memo.approver.length - 1) {
+                                    // Fallback: If memo global status is approved and this is the final approver, assume they did it (legacy/migration support)
+                                    statusColor = "bg-green-100 border-green-300 text-green-700";
+                                    Icon = CheckCircle2;
+                                    badge = <Badge className="bg-green-100 text-green-700 border-green-200 text-[8px] px-1 py-0 ml-1">APPROVED</Badge>;
+                                }
 
                                 return (
                                     <div key={approverEmail} className="flex items-center">
                                         <div className="flex flex-col items-center px-4">
                                             <div className={cn(
                                                 "h-16 w-16 rounded-full flex items-center justify-center font-bold text-lg shadow-md border-2",
-                                                isApproved ? "bg-green-100 border-green-300 text-green-700" : "bg-orange-50 border-orange-200 text-orange-700"
+                                                statusColor
                                             )}>
-                                                {isApproved ? <CheckCircle2 className="h-8 w-8" /> : (approverUser ? approverUser.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().substring(0, 2) : 'A')}
+                                                {status === 'approved' || (memo.status === 'approved' && !userMinute && index === memo.approver.length - 1) ?
+                                                    <CheckCircle2 className="h-8 w-8" /> :
+                                                    (approverUser ? approverUser.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().substring(0, 2) : 'A')
+                                                }
                                             </div>
                                             <div className="mt-3 text-center min-w-[140px] max-w-[160px]">
                                                 <div className="flex items-center justify-center gap-1 mb-1">
                                                     <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Approver {index + 1}</span>
-                                                    {isApproved && <Badge className="bg-green-100 text-green-700 border-green-200 text-[8px] px-1 py-0">✓</Badge>}
+                                                    {badge}
                                                 </div>
                                                 <p className="font-semibold text-sm text-gray-900 truncate">{approverUser?.name || 'Unknown'}</p>
                                                 {approverUser && (

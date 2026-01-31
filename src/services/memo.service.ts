@@ -15,6 +15,8 @@ import {
   getMemosByThread,
 } from "../lib/mock-data";
 import { sleep } from "../lib/utils";
+import dbConnect from "@/lib/db";
+import Memo from "@/models/Memo";
 
 /**
  * Memo Service
@@ -217,11 +219,11 @@ export async function replyToMemo(data: MemoReplyData): Promise<EMemo> {
 
   const recipients = data.replyToAll
     ? [
-        { userId: originalMemo.senderId, type: "to" as const, isRead: false },
-        ...originalMemo.recipients
-          .filter((r) => r.userId !== "user-1")
-          .map((r) => ({ ...r, isRead: false })),
-      ]
+      { userId: originalMemo.senderId, type: "to" as const, isRead: false },
+      ...originalMemo.recipients
+        .filter((r) => r.userId !== "user-1")
+        .map((r) => ({ ...r, isRead: false })),
+    ]
     : [{ userId: originalMemo.senderId, type: "to" as const, isRead: false }];
 
   const replyMemo: EMemo = {
@@ -261,9 +263,8 @@ export async function forwardMemo(data: MemoForwardData): Promise<EMemo> {
   const forwardedMemo: EMemo = {
     id: `memo-${Date.now()}`,
     subject: `FWD: ${originalMemo.subject}`,
-    body: `${data.additionalMessage || ""}\n\n--- Forwarded Message ---\n${
-      originalMemo.body
-    }`,
+    body: `${data.additionalMessage || ""}\n\n--- Forwarded Message ---\n${originalMemo.body
+      }`,
     senderId: "user-1",
     recipients: [
       ...data.recipientIds.to.map((userId) => ({
@@ -328,6 +329,10 @@ export async function deleteMemo(id: string): Promise<void> {
  * Get unread memos count
  */
 export async function getUnreadCount(userId: string): Promise<number> {
-  await sleep(100);
-  return getUnreadMemosCount(userId);
+  await dbConnect();
+  // using userId as email
+  return Memo.countDocuments({
+    to: userId,
+    status: 'pending' // or { $in: ['pending', 'initiated'] }
+  });
 }
