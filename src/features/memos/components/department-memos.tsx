@@ -96,11 +96,11 @@ export function DepartmentMemos() {
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'approved':
-                return <Badge className="bg-green-100 text-green-700 hover:bg-green-100 uppercase text-[10px]">Approved</Badge>;
+                return <Badge className="bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/50 uppercase text-[10px]">Approved</Badge>;
             case 'reviewed':
-                return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 uppercase text-[10px]">Reviewed</Badge>;
+                return <Badge className="bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 uppercase text-[10px]">Reviewed</Badge>;
             default:
-                return <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100 uppercase text-[10px]">Pending</Badge>;
+                return <Badge className="bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-400 hover:bg-yellow-100 dark:hover:bg-yellow-900/50 uppercase text-[10px]">Pending</Badge>;
         }
     };
 
@@ -113,17 +113,17 @@ export function DepartmentMemos() {
                         variant="ghost"
                         size="icon"
                         onClick={() => router.push('/dashboard')}
-                        className="h-8 w-8 shrink-0"
+                        className="h-8 w-8 shrink-0 dark:hover:bg-gray-800"
                     >
-                        <ArrowLeft className="h-4 w-4" />
+                        <ArrowLeft className="h-4 w-4 dark:text-gray-400" />
                     </Button>
                     <div>
-                        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">Department Activity</h1>
-                        <p className="text-[10px] sm:text-sm text-gray-500 line-clamp-1">Monitoring memos in {targetDept || 'your department'}</p>
+                        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white truncate">Department Activity</h1>
+                        <p className="text-[10px] sm:text-sm text-gray-500 dark:text-gray-400 line-clamp-1">Monitoring memos in {targetDept || 'your department'}</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" className="gap-2 border-gray-200 text-gray-700 w-full sm:w-auto text-xs h-9">
+                    <Button variant="outline" size="sm" className="gap-2 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 w-full sm:w-auto text-xs h-9 dark:hover:bg-gray-800">
                         <TrendingUp className="h-3.5 w-3.5" />
                         Analytics
                     </Button>
@@ -132,68 +132,68 @@ export function DepartmentMemos() {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 font-bold">
-                <Card className="p-3 sm:p-4 bg-white border-gray-200 shadow-sm">
+                <Card className="p-3 sm:p-4 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-[9px] sm:text-xs font-bold text-gray-400 uppercase tracking-tighter sm:tracking-normal">Total Memos</p>
-                            <p className="text-lg sm:text-2xl font-bold text-gray-900">{stats.total}</p>
+                            <p className="text-[9px] sm:text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-tighter sm:tracking-normal">Total Memos</p>
+                            <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
                         </div>
-                        <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg">
+                        <div className="p-1.5 sm:p-2 bg-primary/10 dark:bg-primary/20 rounded-lg">
                             <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                         </div>
                     </div>
                 </Card>
-                <Card className="p-3 sm:p-4 bg-white border-gray-200 shadow-sm">
+                <Card className="p-3 sm:p-4 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-[9px] sm:text-xs font-bold text-gray-400 uppercase tracking-tighter sm:tracking-normal">Pending Review</p>
-                            <p className="text-lg sm:text-2xl font-bold text-gray-900">{stats.pending}</p>
+                            <p className="text-[9px] sm:text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-tighter sm:tracking-normal">Pending Review</p>
+                            <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">{stats.pending}</p>
                         </div>
-                        <div className="p-1.5 sm:p-2 bg-yellow-100 rounded-lg">
-                            <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600" />
+                        <div className="p-1.5 sm:p-2 bg-yellow-100 dark:bg-yellow-900/40 rounded-lg">
+                            <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600 dark:text-yellow-500" />
                         </div>
                     </div>
                 </Card>
-                <Card className="p-3 sm:p-4 bg-white border-gray-200 shadow-sm col-span-2 lg:col-span-1">
+                <Card className="p-3 sm:p-4 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm col-span-2 lg:col-span-1">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-[9px] sm:text-xs font-bold text-gray-400 uppercase tracking-tighter sm:tracking-normal">Unread Memos</p>
-                            <p className="text-lg sm:text-2xl font-bold text-gray-900">{stats.unread}</p>
+                            <p className="text-[9px] sm:text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-tighter sm:tracking-normal">Unread Memos</p>
+                            <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">{stats.unread}</p>
                         </div>
-                        <div className="p-1.5 sm:p-2 bg-red-100 rounded-lg">
-                            <Eye className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
+                        <div className="p-1.5 sm:p-2 bg-red-100 dark:bg-red-900/40 rounded-lg">
+                            <Eye className="h-4 w-4 sm:h-5 sm:w-5 text-red-600 dark:text-red-500" />
                         </div>
                     </div>
                 </Card>
             </div>
 
             {/* Filters & Search */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-white p-3 sm:p-4 rounded-lg border border-gray-200 shadow-sm">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-white dark:bg-gray-800 p-3 sm:p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
                 <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
                     <Input
                         placeholder="Search initiator or subject..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-9 bg-white border-gray-200 text-gray-900 text-sm h-10 w-full"
+                        className="pl-9 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white text-sm h-10 w-full placeholder:text-gray-400 dark:placeholder:text-gray-500"
                     />
                 </div>
-                <Button variant="outline" className="gap-2 border-gray-200 text-gray-700 h-10 text-xs px-4">
+                <Button variant="outline" className="gap-2 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 h-10 text-xs px-4 dark:hover:bg-gray-700">
                     <Filter className="h-3.5 w-3.5" />
                     Filter
                 </Button>
             </div>
 
             {/* Memos Table */}
-            <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-x-auto scrollbar-none">
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm overflow-x-auto scrollbar-none">
                 <Table className="min-w-[700px] lg:min-w-full">
                     <TableHeader>
-                        <TableRow className="hover:bg-gray-50/50 bg-gray-50/50">
-                            <TableHead className="text-[10px] font-bold uppercase text-gray-400">Initiator</TableHead>
-                            <TableHead className="text-[10px] font-bold uppercase text-gray-400">Subject</TableHead>
-                            <TableHead className="text-[10px] font-bold uppercase text-gray-400">Date</TableHead>
-                            <TableHead className="text-[10px] font-bold uppercase text-gray-400">Status</TableHead>
-                            <TableHead className="text-[10px] font-bold uppercase text-gray-400 text-right">Action</TableHead>
+                        <TableRow className="hover:bg-gray-50/50 dark:hover:bg-gray-900/50 bg-gray-50/50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-700">
+                            <TableHead className="text-[10px] font-bold uppercase text-gray-400 dark:text-gray-500">Initiator</TableHead>
+                            <TableHead className="text-[10px] font-bold uppercase text-gray-400 dark:text-gray-500">Subject</TableHead>
+                            <TableHead className="text-[10px] font-bold uppercase text-gray-400 dark:text-gray-500">Date</TableHead>
+                            <TableHead className="text-[10px] font-bold uppercase text-gray-400 dark:text-gray-500">Status</TableHead>
+                            <TableHead className="text-[10px] font-bold uppercase text-gray-400 dark:text-gray-500 text-right">Action</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -205,18 +205,18 @@ export function DepartmentMemos() {
                                             "h-2 w-2 rounded-full",
                                             memo.isRead ? "bg-transparent" : "bg-primary"
                                         )} title={memo.isRead ? "Read" : "Unread"} />
-                                        <span className="font-medium text-gray-900 text-sm">{memo.fromName}</span>
+                                        <span className="font-medium text-gray-900 dark:text-white text-sm">{memo.fromName}</span>
                                     </div>
                                 </TableCell>
-                                <TableCell className="text-gray-700 text-sm">{memo.subject}</TableCell>
-                                <TableCell className="text-gray-500 text-xs">{memo.date}</TableCell>
+                                <TableCell className="text-gray-700 dark:text-gray-300 text-sm">{memo.subject}</TableCell>
+                                <TableCell className="text-gray-500 dark:text-gray-400 text-xs">{memo.date}</TableCell>
                                 <TableCell>{getStatusBadge(memo.status)}</TableCell>
                                 <TableCell className="text-right">
                                     <div className="flex items-center justify-end gap-2">
                                         <Button
                                             variant="ghost"
                                             size="sm"
-                                            className="text-primary hover:text-primary/90 gap-1"
+                                            className="text-primary dark:text-primary-foreground hover:text-primary/90 gap-1 dark:hover:bg-primary/20"
                                             onClick={() => router.push(`/dashboard/memos/inbox/${memo._id}`)}
                                         >
                                             <Eye className="h-3 w-3" />
@@ -225,7 +225,7 @@ export function DepartmentMemos() {
                                         <Button
                                             variant="ghost"
                                             size="sm"
-                                            className="text-gray-400 hover:text-red-500 hover:bg-red-50"
+                                            className="text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
                                             onClick={() => handleDeleteIndividual(memo._id)}
                                         >
                                             <Trash2 className="h-3.5 w-3.5" />
@@ -244,7 +244,7 @@ export function DepartmentMemos() {
 // Internal Card component to avoid missing imports if not exported from UI
 function Card({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
     return (
-        <div className={cn("rounded-lg border bg-card text-card-foreground shadow-sm", className)} {...props}>
+        <div className={cn("rounded-lg border bg-card dark:bg-gray-800 text-card-foreground dark:text-white shadow-sm border-gray-200 dark:border-gray-700", className)} {...props}>
             {children}
         </div>
     );

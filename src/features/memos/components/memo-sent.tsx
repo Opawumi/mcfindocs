@@ -21,32 +21,32 @@ interface Memo {
 
 function SentMemoItem({ memo, onClick, onDelete }: { memo: Memo, onClick: () => void, onDelete: (e: React.MouseEvent) => void }) {
     const statusColors = {
-        pending: "bg-yellow-100 text-yellow-700 border-yellow-200",
-        reviewed: "bg-blue-100 text-blue-700 border-blue-200",
-        approved: "bg-green-100 text-green-700 border-green-200",
-        initiated: "bg-gray-100 text-gray-700 border-gray-200"
+        pending: "bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800",
+        reviewed: "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800",
+        approved: "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800",
+        initiated: "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700"
     };
 
     const getInitials = (name: string) => name?.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) || 'R';
 
     return (
         <div
-            className="flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-lg hover:border-primary/50 hover:shadow-md cursor-pointer transition-all duration-200 group relative"
+            className="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-primary/50 dark:hover:border-primary/50 hover:shadow-md cursor-pointer transition-all duration-200 group relative"
             onClick={onClick}
         >
-            <div className="flex items-center justify-center h-10 w-10 rounded-full bg-primary/10 text-primary font-bold text-xs shrink-0">
+            <div className="flex items-center justify-center h-10 w-10 rounded-full bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-foreground font-bold text-xs shrink-0">
                 {getInitials(memo.to[0] || 'Recipient')}
             </div>
             <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-semibold text-gray-900 truncate">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
                         To: {memo.to.join(', ')}
                     </p>
-                    <span className="text-[10px] text-gray-400 font-medium whitespace-nowrap uppercase">
+                    <span className="text-[10px] text-gray-400 dark:text-gray-500 font-medium whitespace-nowrap uppercase">
                         {memo.date}
                     </span>
                 </div>
-                <h3 className="text-sm text-gray-600 truncate mt-0.5">
+                <h3 className="text-sm text-gray-600 dark:text-gray-400 truncate mt-0.5">
                     {memo.subject}
                 </h3>
             </div>
@@ -61,7 +61,7 @@ function SentMemoItem({ memo, onClick, onDelete }: { memo: Memo, onClick: () => 
                     variant="ghost"
                     size="icon"
                     onClick={onDelete}
-                    className="h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="h-8 w-8 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 opacity-0 group-hover:opacity-100 transition-opacity"
                     title="Delete Memo"
                 >
                     <Trash2 className="h-4 w-4" />
@@ -133,7 +133,7 @@ export function MemoSent() {
     const totalItems = filteredMemos.length;
 
     if (loading) {
-        return <div className="p-8 text-center text-gray-500">Loading sent memos...</div>;
+        return <div className="p-8 text-center text-gray-500 dark:text-gray-400">Loading sent memos...</div>;
     }
 
     return (
@@ -144,11 +144,11 @@ export function MemoSent() {
                     variant="ghost"
                     size="icon"
                     onClick={() => router.push('/dashboard')}
-                    className="h-8 w-8"
+                    className="h-8 w-8 dark:hover:bg-gray-800"
                 >
-                    <ArrowLeft className="h-4 w-4 text-gray-900" />
+                    <ArrowLeft className="h-4 w-4 text-gray-900 dark:text-white" />
                 </Button>
-                <h1 className="text-2xl font-bold text-foreground">Memo Sent</h1>
+                <h1 className="text-2xl font-bold text-foreground dark:text-white">Memo Sent</h1>
             </div>
 
             {/* Create Memo Button */}
@@ -168,7 +168,7 @@ export function MemoSent() {
                         placeholder="Search"
                         value={searchQuery}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-                        className="pr-10 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400"
+                        className="pr-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                     />
                 </div>
                 <Button
@@ -181,7 +181,7 @@ export function MemoSent() {
 
             {/* List */}
             {filteredMemos.length === 0 ? (
-                <div className="bg-white border border-gray-200 rounded-lg p-12 shadow-sm text-center text-gray-500">
+                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-12 shadow-sm text-center text-gray-500 dark:text-gray-400">
                     No sent memos found
                 </div>
             ) : (
@@ -198,15 +198,15 @@ export function MemoSent() {
             )}
 
             {/* Pagination */}
-            <div className="flex items-center justify-end gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center justify-end gap-4 text-sm text-muted-foreground dark:text-gray-400">
                 <span>
                     {startItem}-{endItem} of {totalItems}
                 </span>
                 <div className="flex gap-1">
-                    <Button variant="ghost" size="icon" className="h-8 w-8" disabled={currentPage === 1}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 dark:hover:bg-gray-800" disabled={currentPage === 1}>
                         <ChevronLeft className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8" disabled={currentPage === totalPages}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 dark:hover:bg-gray-800" disabled={currentPage === totalPages}>
                         <ChevronRight className="h-4 w-4" />
                     </Button>
                 </div>

@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap");
 @import "tailwindcss";
+@config "../tailwind.config.js";
 
 body,
 html,
@@ -107,6 +108,47 @@ html,
     /* Primary/Secondary Foreground */
     --color-primary-foreground: var(--color-white);
     --color-secondary-foreground: var(--color-dark);
+  }
+
+  /* Dark Mode Theme */
+  .dark {
+    --color-foreground: #f9fafb;
+    --color-background: #111827;
+    --color-muted: #374151;
+    --color-muted-foreground: #9ca3af;
+    --color-accent: var(--color-primary);
+    --color-accent-foreground: var(--color-white);
+    --color-destructive: #ef4444;
+    --color-destructive-foreground: var(--color-white);
+
+    /* Card Colors - Dark */
+    --color-card: #1f2937;
+    --color-card-foreground: #f9fafb;
+
+    /* Popover Colors - Dark */
+    --color-popover: #1f2937;
+    --color-popover-foreground: #f9fafb;
+
+    /* Border/Input - Dark */
+    --color-border: #374151;
+    --color-input: #374151;
+
+    /* Sidebar Colors - Dark */
+    --color-sidebar-background: #1f2937;
+    --color-sidebar-foreground: #f9fafb;
+    --color-sidebar-border: #374151;
+    --color-sidebar-accent: #374151;
+    --color-sidebar-accent-foreground: #f9fafb;
+
+    /* Primary/Secondary Foreground - Dark */
+    --color-primary-foreground: var(--color-white);
+    --color-secondary-foreground: #f9fafb;
+  }
+
+  /* Apply dark mode background to body */
+  .dark body {
+    background-color: #111827;
+    color: #f9fafb;
   }
 }
 

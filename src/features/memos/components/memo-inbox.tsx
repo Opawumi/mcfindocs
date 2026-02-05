@@ -33,8 +33,8 @@ function MemoItem({ memo, selected, onSelect, onClick, onDelete, getInitials }: 
     return (
         <div
             className={cn(
-                "flex items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-white border rounded-lg hover:border-primary/50 hover:shadow-md cursor-pointer transition-all duration-200 group relative",
-                memo.isRead ? "border-gray-200" : "border-primary/30 bg-primary/[0.01]"
+                "flex items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg hover:border-primary/50 dark:hover:border-primary/50 hover:shadow-md cursor-pointer transition-all duration-200 group relative",
+                memo.isRead ? "border-gray-200 dark:border-gray-700" : "border-primary/30 dark:border-primary/50 bg-primary/[0.01] dark:bg-primary/[0.05]"
             )}
             onClick={onClick}
         >
@@ -60,7 +60,7 @@ function MemoItem({ memo, selected, onSelect, onClick, onDelete, getInitials }: 
                     <div className="flex items-center justify-between gap-2 overflow-hidden">
                         <p className={cn(
                             "text-sm truncate",
-                            memo.isRead ? "text-gray-600 font-normal" : "text-gray-900 font-bold"
+                            memo.isRead ? "text-gray-600 dark:text-gray-400 font-normal" : "text-gray-900 dark:text-gray-100 font-bold"
                         )}>
                             {memo.fromName || memo.from}
                         </p>
@@ -70,18 +70,18 @@ function MemoItem({ memo, selected, onSelect, onClick, onDelete, getInitials }: 
                     </div>
 
                     <div className="flex flex-col sm:items-end">
-                        <span className="text-[10px] text-gray-400 font-medium whitespace-nowrap uppercase hidden sm:block">
+                        <span className="text-[10px] text-gray-400 dark:text-gray-500 font-medium whitespace-nowrap uppercase hidden sm:block">
                             {memo.date}
                         </span>
                         {isApproved ? (
                             <div className="flex flex-row sm:flex-col items-center sm:items-end gap-1 sm:gap-0 sm:mt-0.5">
-                                <span className="text-[8px] sm:text-[9px] font-bold text-green-600 uppercase">Approved</span>
-                                <span className="hidden sm:inline-block text-[10px] font-semibold text-gray-700 truncate max-w-[100px]">{memo.approvedByName}</span>
+                                <span className="text-[8px] sm:text-[9px] font-bold text-green-600 dark:text-green-500 uppercase">Approved</span>
+                                <span className="hidden sm:inline-block text-[10px] font-semibold text-gray-700 dark:text-gray-300 truncate max-w-[100px]">{memo.approvedByName}</span>
                             </div>
                         ) : (
                             <div className="flex flex-row sm:flex-col items-center sm:items-end gap-1 sm:gap-0 sm:mt-0.5">
-                                <span className="text-[8px] sm:text-[9px] font-bold text-primary uppercase">Office:</span>
-                                <span className="text-[9px] sm:text-[10px] font-semibold text-gray-700 truncate max-w-[100px]">{memo.fromDept}</span>
+                                <span className="text-[8px] sm:text-[9px] font-bold text-primary dark:text-primary uppercase">Office:</span>
+                                <span className="text-[9px] sm:text-[10px] font-semibold text-gray-700 dark:text-gray-300 truncate max-w-[100px]">{memo.fromDept}</span>
                             </div>
                         )}
                     </div>
@@ -89,20 +89,20 @@ function MemoItem({ memo, selected, onSelect, onClick, onDelete, getInitials }: 
 
                 <h3 className={cn(
                     "text-xs sm:text-sm truncate mt-0.5",
-                    memo.isRead ? "text-gray-500" : "text-gray-800 font-semibold"
+                    memo.isRead ? "text-gray-500 dark:text-gray-400" : "text-gray-800 dark:text-gray-200 font-semibold"
                 )}>
                     {memo.subject}
                 </h3>
 
                 <div className="flex items-center justify-between gap-4 mt-1">
-                    <p className="text-[10px] sm:text-xs text-gray-400 truncate line-clamp-1 flex-1 italic">
+                    <p className="text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 truncate line-clamp-1 flex-1 italic">
                         {memo.message?.replace(/<[^>]*>?/gm, '')}
                     </p>
                     <Button
                         variant="ghost"
                         size="icon"
                         onClick={onDelete}
-                        className="h-7 w-7 sm:h-8 sm:w-8 text-gray-400 hover:text-red-500 hover:bg-red-50 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                        className="h-7 w-7 sm:h-8 sm:w-8 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
                         title="Delete Memo"
                     >
                         <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -234,20 +234,20 @@ export function MemoInbox() {
     const totalItems = filteredMemos.length;
 
     if (loading) {
-        return <div className="p-8 text-center text-gray-500">Loading memos...</div>;
+        return <div className="p-8 text-center text-gray-500 dark:text-gray-400">Loading memos...</div>;
     }
 
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                    <Button variant="ghost" size="icon" onClick={() => router.push('/dashboard')} className="h-8 w-8">
-                        <ArrowLeft className="h-4 w-4 text-gray-900" />
+                    <Button variant="ghost" size="icon" onClick={() => router.push('/dashboard')} className="h-8 w-8 dark:hover:bg-gray-800">
+                        <ArrowLeft className="h-4 w-4 text-gray-900 dark:text-white" />
                     </Button>
-                    <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">Memo Inbox</h1>
+                    <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate dark:text-white">Memo Inbox</h1>
                 </div>
 
-                <Button onClick={() => router.push('/dashboard/memos/create')} className="bg-primary hover:bg-primary/90 w-full sm:w-auto h-10 font-bold uppercase tracking-tight text-xs">
+                <Button onClick={() => router.push('/dashboard/memos/create')} className="bg-primary hover:bg-primary/90 w-full sm:w-auto h-10 font-bold uppercase tracking-tight text-xs shadow-lg shadow-primary/20 dark:shadow-none">
                     Create Memo
                 </Button>
             </div>
@@ -259,15 +259,15 @@ export function MemoInbox() {
                             placeholder="Search"
                             value={searchQuery}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-                            className="pr-10 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400"
+                            className="pr-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                         />
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
                     </div>
                 </div>
 
                 {selectedMemos.length > 0 && (
                     <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-4">
-                        <span className="text-sm text-gray-500 mr-2">{selectedMemos.length} selected</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400 mr-2">{selectedMemos.length} selected</span>
                         <Button
                             variant="destructive"
                             size="sm"
@@ -281,18 +281,18 @@ export function MemoInbox() {
             </div>
 
             <Tabs value={activeTab} onValueChange={(v: string) => setActiveTab(v as 'approved' | 'pending')} className="w-full">
-                <TabsList className="bg-transparent border-b rounded-none w-full justify-start h-auto p-0 overflow-x-auto overflow-y-hidden scrollbar-none flex-nowrap">
-                    <TabsTrigger value="approved" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary px-4 py-2 text-xs sm:text-sm font-bold whitespace-nowrap">
+                <TabsList className="bg-transparent border-b dark:border-gray-800 rounded-none w-full justify-start h-auto p-0 overflow-x-auto overflow-y-hidden scrollbar-none flex-nowrap">
+                    <TabsTrigger value="approved" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary px-4 py-2 text-xs sm:text-sm font-bold whitespace-nowrap dark:text-gray-400 dark:data-[state=active]:text-primary">
                         APPROVED
                     </TabsTrigger>
-                    <TabsTrigger value="pending" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary px-4 py-2 text-xs sm:text-sm font-bold whitespace-nowrap">
+                    <TabsTrigger value="pending" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary px-4 py-2 text-xs sm:text-sm font-bold whitespace-nowrap dark:text-gray-400 dark:data-[state=active]:text-primary">
                         PENDING
                     </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="approved" className="mt-6">
                     {approvedMemos.length === 0 ? (
-                        <div className="text-center py-12 text-muted-foreground bg-white rounded-lg border border-dashed">No approved memos</div>
+                        <div className="text-center py-12 text-muted-foreground dark:text-gray-500 bg-white dark:bg-gray-800/50 rounded-lg border border-dashed border-gray-200 dark:border-gray-700">No approved memos</div>
                     ) : (
                         <div className="space-y-3">
                             {approvedMemos.filter(m =>
@@ -318,7 +318,7 @@ export function MemoInbox() {
 
                 <TabsContent value="pending" className="mt-6">
                     {pendingMemos.length === 0 ? (
-                        <div className="text-center py-12 text-muted-foreground bg-white rounded-lg border border-dashed">No pending memos</div>
+                        <div className="text-center py-12 text-muted-foreground dark:text-gray-500 bg-white dark:bg-gray-800/50 rounded-lg border border-dashed border-gray-200 dark:border-gray-700">No pending memos</div>
                     ) : (
                         <div className="space-y-3">
                             {pendingMemos.filter(m =>
@@ -343,13 +343,13 @@ export function MemoInbox() {
                 </TabsContent>
             </Tabs>
 
-            <div className="flex items-center justify-end gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center justify-end gap-4 text-sm text-muted-foreground dark:text-gray-400">
                 <span>{startItem}-{endItem} of {totalItems}</span>
                 <div className="flex gap-1">
-                    <Button variant="ghost" size="icon" className="h-8 w-8" disabled={currentPage === 1}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 dark:hover:bg-gray-800" disabled={currentPage === 1}>
                         <ChevronLeft className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8" disabled={currentPage === totalPages}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 dark:hover:bg-gray-800" disabled={currentPage === totalPages}>
                         <ChevronRight className="h-4 w-4" />
                     </Button>
                 </div>

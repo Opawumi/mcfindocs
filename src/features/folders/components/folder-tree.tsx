@@ -45,7 +45,7 @@ function FolderTreeItem({
           level > 0 && 'pl-8',
           isSelected
             ? 'bg-primary text-white'
-            : 'hover:bg-gray-100 text-gray-700'
+            : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
         )}
       >
         {/* Expand/Collapse */}
@@ -77,7 +77,7 @@ function FolderTreeItem({
           {folder.documentCount !== undefined && folder.documentCount > 0 && (
             <span className={cn(
               "text-xs",
-              isSelected ? "text-white/80" : "text-gray-500"
+              isSelected ? "text-white/80" : "text-gray-500 dark:text-gray-400"
             )}>
               {folder.documentCount}
             </span>
@@ -93,23 +93,23 @@ function FolderTreeItem({
                 size="icon"
                 className={cn(
                   "h-6 w-6",
-                  isSelected ? "hover:bg-white/20" : "hover:bg-gray-200"
+                  isSelected ? "hover:bg-white/20" : "hover:bg-gray-200 dark:hover:bg-gray-600"
                 )}
               >
                 <MoreVertical className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-              <DropdownMenuItem onClick={() => onCreateSubfolder(folder.id)}>
+            <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()} className="dark:bg-gray-800 dark:border-gray-700">
+              <DropdownMenuItem onClick={() => onCreateSubfolder(folder.id)} className="dark:hover:bg-gray-700">
                 <Plus className="mr-2 h-4 w-4" />
                 New Subfolder
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onRename(folder.id)}>
+              <DropdownMenuItem onClick={() => onRename(folder.id)} className="dark:hover:bg-gray-700">
                 <Edit className="mr-2 h-4 w-4" />
                 Rename
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => onDelete(folder.id)} className="text-red-600">
+              <DropdownMenuSeparator className="dark:bg-gray-700" />
+              <DropdownMenuItem onClick={() => onDelete(folder.id)} className="text-red-600 dark:hover:bg-gray-700">
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete
               </DropdownMenuItem>
@@ -167,7 +167,7 @@ export function FolderTree({
           'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
           selectedFolderId === null
             ? 'bg-primary text-white'
-            : 'hover:bg-gray-100 text-gray-700'
+            : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
         )}
       >
         <FolderIcon className="h-4 w-4" />
@@ -191,7 +191,7 @@ export function FolderTree({
       {/* New Folder Button */}
       <button
         onClick={() => onCreateFolder()}
-        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors mt-2"
+        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors mt-2"
       >
         <Plus className="h-4 w-4" />
         <span>New Folder</span>

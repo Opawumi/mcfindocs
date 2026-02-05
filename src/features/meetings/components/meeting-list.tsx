@@ -57,11 +57,11 @@ export function MeetingList() {
                     variant="ghost"
                     size="icon"
                     onClick={() => router.push('/dashboard')}
-                    className="h-8 w-8"
+                    className="h-8 w-8 dark:hover:bg-gray-800"
                 >
-                    <ArrowLeft className="h-4 w-4 text-gray-900" />
+                    <ArrowLeft className="h-4 w-4 text-gray-900 dark:text-white" />
                 </Button>
-                <h1 className="text-2xl font-bold text-gray-900">Meeting List</h1>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Meeting List</h1>
             </div>
 
             <div className="flex items-center justify-between">
@@ -71,18 +71,18 @@ export function MeetingList() {
                         placeholder="Search"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="bg-white border-gray-200 text-gray-900 placeholder:text-gray-400"
+                        className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                     />
                 </div>
 
                 {/* Pagination Stats */}
-                <div className="flex items-center gap-4 text-sm text-gray-600">
+                <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                     <span>1-{filteredMeetings.length} of {mockMeetings.length}</span>
                     <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400" disabled>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800" disabled>
                             <ChevronLeft className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400" disabled>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800" disabled>
                             <ChevronRight className="h-4 w-4" />
                         </Button>
                     </div>
@@ -90,22 +90,22 @@ export function MeetingList() {
             </div>
 
             {/* List */}
-            <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm overflow-hidden">
                 {filteredMeetings.map((meeting, index) => (
                     <div
                         key={meeting.id}
                         className={cn(
-                            "flex items-center px-6 py-4 hover:bg-gray-50 transition-colors cursor-pointer",
-                            index !== filteredMeetings.length - 1 && "border-b border-gray-100"
+                            "flex items-center px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors cursor-pointer",
+                            index !== filteredMeetings.length - 1 && "border-b border-gray-100 dark:border-gray-700"
                         )}
                     >
-                        <div className="w-1/4 font-semibold text-gray-900 truncate pr-4">
+                        <div className="w-1/4 font-semibold text-gray-900 dark:text-white truncate pr-4">
                             To: {meeting.to}
                         </div>
-                        <div className="flex-1 text-gray-700 truncate pr-4">
+                        <div className="flex-1 text-gray-700 dark:text-gray-300 truncate pr-4">
                             {meeting.subject}
                         </div>
-                        <div className="min-w-[100px] text-right text-gray-500 text-sm">
+                        <div className="min-w-[100px] text-right text-gray-500 dark:text-gray-400 text-sm">
                             {meeting.date}
                         </div>
                     </div>

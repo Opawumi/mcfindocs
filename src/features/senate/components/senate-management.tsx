@@ -186,9 +186,9 @@ export function SenateManagement() {
     return (
         <div className="flex h-full">
             {/* Sidebar */}
-            <div className="w-48 bg-white border-r border-gray-200 flex-shrink-0">
+            <div className="w-48 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex-shrink-0">
                 <div className="p-4">
-                    <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">
+                    <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-4">
                         E-Senate
                     </h2>
                     <div className="space-y-1">
@@ -197,8 +197,8 @@ export function SenateManagement() {
                             className={cn(
                                 'w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors',
                                 activeTab === 'faculty'
-                                    ? 'bg-primary text-white'
-                                    : 'text-gray-700 hover:bg-gray-100'
+                                    ? 'bg-primary text-white shadow-sm'
+                                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                             )}
                         >
                             Faculty
@@ -208,8 +208,8 @@ export function SenateManagement() {
                             className={cn(
                                 'w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors',
                                 activeTab === 'department'
-                                    ? 'bg-primary text-white'
-                                    : 'text-gray-700 hover:bg-gray-100'
+                                    ? 'bg-primary text-white shadow-sm'
+                                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                             )}
                         >
                             Department
@@ -218,7 +218,7 @@ export function SenateManagement() {
                 </div>
 
                 <div className="absolute bottom-4 left-4 right-4">
-                    <button className="w-full text-left px-3 py-2 text-sm text-gray-600 hover:text-gray-900 font-medium flex items-center gap-2">
+                    <button className="w-full text-left px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium flex items-center gap-2 transition-colors">
                         <span>←</span>
                         Log Out
                     </button>
@@ -226,15 +226,15 @@ export function SenateManagement() {
             </div>
 
             {/* Main Content */}
-            <div className="flex-1 bg-gray-50">
+            <div className="flex-1 bg-gray-50 dark:bg-gray-900/50">
                 <div className="p-6">
                     {/* Header */}
                     <div className="flex items-center justify-between mb-6">
                         <div>
-                            <h1 className="text-2xl font-bold text-gray-900">
+                            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                                 {activeTab === 'faculty' ? 'Faculty Management' : 'Department Management'}
                             </h1>
-                            <p className="text-sm text-gray-600 mt-1">
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                                 {activeTab === 'faculty'
                                     ? 'Manage academic faculties'
                                     : 'Manage departments across faculties'}
@@ -242,7 +242,7 @@ export function SenateManagement() {
                         </div>
                         <Button
                             onClick={activeTab === 'faculty' ? handleAddFaculty : handleAddDepartment}
-                            className="bg-primary hover:bg-primary/90"
+                            className="bg-primary hover:bg-primary/90 shadow-md shadow-primary/20 dark:shadow-none"
                         >
                             <Plus className="h-4 w-4 mr-2" />
                             Add {activeTab === 'faculty' ? 'Faculty' : 'Department'}
@@ -250,43 +250,43 @@ export function SenateManagement() {
                     </div>
 
                     {/* Table */}
-                    <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
                         {isLoading ? (
                             <div className="p-12 text-center">
                                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                                <p className="text-sm text-gray-600 mt-4">Loading...</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mt-4">Loading...</p>
                             </div>
                         ) : activeTab === 'faculty' ? (
                             <Table>
-                                <TableHeader>
-                                    <TableRow className="bg-gray-50/50">
-                                        <TableHead className="w-12 font-semibold text-gray-700">#</TableHead>
-                                        <TableHead className="font-semibold text-gray-700">FACULTY NAME</TableHead>
-                                        <TableHead className="font-semibold text-gray-700">CODE</TableHead>
-                                        <TableHead className="font-semibold text-gray-700">DEAN</TableHead>
-                                        <TableHead className="text-right font-semibold text-gray-700">ACTION</TableHead>
+                                <TableHeader className="bg-gray-50/50 dark:bg-gray-900/50">
+                                    <TableRow className="border-gray-200 dark:border-gray-700">
+                                        <TableHead className="w-12 font-semibold text-gray-700 dark:text-gray-300">#</TableHead>
+                                        <TableHead className="font-semibold text-gray-700 dark:text-gray-300">FACULTY NAME</TableHead>
+                                        <TableHead className="font-semibold text-gray-700 dark:text-gray-300">CODE</TableHead>
+                                        <TableHead className="font-semibold text-gray-700 dark:text-gray-300">DEAN</TableHead>
+                                        <TableHead className="text-right font-semibold text-gray-700 dark:text-gray-300">ACTION</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {faculties.length === 0 ? (
-                                        <TableRow>
-                                            <TableCell colSpan={5} className="text-center py-12 text-gray-500">
+                                        <TableRow className="border-gray-200 dark:border-gray-700">
+                                            <TableCell colSpan={5} className="text-center py-12 text-gray-500 dark:text-gray-400">
                                                 No faculties found. Create your first faculty to get started.
                                             </TableCell>
                                         </TableRow>
                                     ) : (
                                         faculties.map((faculty, index) => (
-                                            <TableRow key={faculty.id} className="hover:bg-gray-50">
-                                                <TableCell className="font-medium text-gray-600">{index + 1}</TableCell>
-                                                <TableCell className="font-medium text-gray-900">{faculty.name}</TableCell>
-                                                <TableCell className="text-gray-600">{faculty.code}</TableCell>
-                                                <TableCell className="text-gray-600">{faculty.dean || '-'}</TableCell>
+                                            <TableRow key={faculty.id} className="hover:bg-gray-50 dark:hover:bg-gray-900/50 border-gray-200 dark:border-gray-700">
+                                                <TableCell className="font-medium text-gray-600 dark:text-gray-400">{index + 1}</TableCell>
+                                                <TableCell className="font-medium text-gray-900 dark:text-white uppercase tracking-tight">{faculty.name}</TableCell>
+                                                <TableCell className="text-gray-600 dark:text-gray-400 font-mono text-xs">{faculty.code}</TableCell>
+                                                <TableCell className="text-gray-600 dark:text-gray-400">{faculty.dean || '-'}</TableCell>
                                                 <TableCell className="text-right">
                                                     <div className="flex items-center justify-end gap-2">
                                                         <Button
                                                             variant="ghost"
                                                             size="sm"
-                                                            className="h-8 w-8 p-0 text-primary hover:text-primary/90 hover:bg-primary/10"
+                                                            className="h-8 w-8 p-0 text-primary hover:text-primary/90 hover:bg-primary/10 dark:hover:bg-primary/20"
                                                             onClick={() => handleViewFaculty(faculty)}
                                                         >
                                                             <Eye className="h-4 w-4" />
@@ -294,7 +294,7 @@ export function SenateManagement() {
                                                         <Button
                                                             variant="ghost"
                                                             size="sm"
-                                                            className="h-8 w-8 p-0 text-gray-600 hover:text-gray-700 hover:bg-gray-100"
+                                                            className="h-8 w-8 p-0 text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                                                             onClick={() => handleEditFaculty(faculty)}
                                                         >
                                                             <Pencil className="h-4 w-4" />
@@ -302,7 +302,7 @@ export function SenateManagement() {
                                                         <Button
                                                             variant="ghost"
                                                             size="sm"
-                                                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                            className="h-8 w-8 p-0 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20"
                                                             onClick={() => handleDeleteClick('faculty', faculty.id, faculty.name)}
                                                         >
                                                             <Trash2 className="h-4 w-4" />
@@ -316,35 +316,35 @@ export function SenateManagement() {
                             </Table>
                         ) : (
                             <Table>
-                                <TableHeader>
-                                    <TableRow className="bg-gray-50/50">
-                                        <TableHead className="w-12 font-semibold text-gray-700">#</TableHead>
-                                        <TableHead className="font-semibold text-gray-700">DEPARTMENT NAME</TableHead>
-                                        <TableHead className="font-semibold text-gray-700">FACULTY NAME</TableHead>
-                                        <TableHead className="font-semibold text-gray-700">EMPLOYEE NAME</TableHead>
-                                        <TableHead className="text-right font-semibold text-gray-700">ACTION</TableHead>
+                                <TableHeader className="bg-gray-50/50 dark:bg-gray-900/50">
+                                    <TableRow className="border-gray-200 dark:border-gray-700">
+                                        <TableHead className="w-12 font-semibold text-gray-700 dark:text-gray-300">#</TableHead>
+                                        <TableHead className="font-semibold text-gray-700 dark:text-gray-300">DEPARTMENT NAME</TableHead>
+                                        <TableHead className="font-semibold text-gray-700 dark:text-gray-300">FACULTY NAME</TableHead>
+                                        <TableHead className="font-semibold text-gray-700 dark:text-gray-300">EMPLOYEE NAME</TableHead>
+                                        <TableHead className="text-right font-semibold text-gray-700 dark:text-gray-300">ACTION</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {departments.length === 0 ? (
-                                        <TableRow>
-                                            <TableCell colSpan={5} className="text-center py-12 text-gray-500">
+                                        <TableRow className="border-gray-200 dark:border-gray-700">
+                                            <TableCell colSpan={5} className="text-center py-12 text-gray-500 dark:text-gray-500">
                                                 No departments found. Create your first department to get started.
                                             </TableCell>
                                         </TableRow>
                                     ) : (
                                         departments.map((department, index) => (
-                                            <TableRow key={department.id} className="hover:bg-gray-50">
-                                                <TableCell className="font-medium text-gray-600">{index + 1}</TableCell>
-                                                <TableCell className="font-medium text-gray-900">{department.name}</TableCell>
-                                                <TableCell className="text-gray-600">{department.facultyName}</TableCell>
-                                                <TableCell className="text-gray-600">{department.headOfDepartment || '-'}</TableCell>
+                                            <TableRow key={department.id} className="hover:bg-gray-50 dark:hover:bg-gray-900/50 border-gray-200 dark:border-gray-700">
+                                                <TableCell className="font-medium text-gray-600 dark:text-gray-400">{index + 1}</TableCell>
+                                                <TableCell className="font-medium text-gray-900 dark:text-white uppercase tracking-tight">{department.name}</TableCell>
+                                                <TableCell className="text-gray-600 dark:text-gray-400">{department.facultyName}</TableCell>
+                                                <TableCell className="text-gray-600 dark:text-gray-400">{department.headOfDepartment || '-'}</TableCell>
                                                 <TableCell className="text-right">
                                                     <div className="flex items-center justify-end gap-2">
                                                         <Button
                                                             variant="ghost"
                                                             size="sm"
-                                                            className="h-8 w-8 p-0 text-primary hover:text-primary/90 hover:bg-primary/10"
+                                                            className="h-8 w-8 p-0 text-primary hover:text-primary/90 hover:bg-primary/10 dark:hover:bg-primary/20"
                                                             onClick={() => handleViewDepartment(department)}
                                                         >
                                                             <Eye className="h-4 w-4" />
@@ -352,7 +352,7 @@ export function SenateManagement() {
                                                         <Button
                                                             variant="ghost"
                                                             size="sm"
-                                                            className="h-8 w-8 p-0 text-gray-600 hover:text-gray-700 hover:bg-gray-100"
+                                                            className="h-8 w-8 p-0 text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                                                             onClick={() => handleEditDepartment(department)}
                                                         >
                                                             <Pencil className="h-4 w-4" />
@@ -360,7 +360,7 @@ export function SenateManagement() {
                                                         <Button
                                                             variant="ghost"
                                                             size="sm"
-                                                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                            className="h-8 w-8 p-0 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20"
                                                             onClick={() => handleDeleteClick('department', department.id, department.name)}
                                                         >
                                                             <Trash2 className="h-4 w-4" />
@@ -410,20 +410,20 @@ export function SenateManagement() {
             />
 
             <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                <AlertDialogContent>
+                <AlertDialogContent className="dark:bg-gray-900 dark:border-gray-700">
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This will permanently delete <strong>{itemToDelete?.name}</strong>.
+                        <AlertDialogTitle className="dark:text-white">Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription className="dark:text-gray-400">
+                            This will permanently delete <strong className="dark:text-gray-200">{itemToDelete?.name}</strong>.
                             This action cannot be undone.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel disabled={isSubmitting} className="dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700">Cancel</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleConfirmDelete}
                             disabled={isSubmitting}
-                            className="bg-red-600 hover:bg-red-700"
+                            className="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600"
                         >
                             {isSubmitting ? 'Deleting...' : 'Delete'}
                         </AlertDialogAction>

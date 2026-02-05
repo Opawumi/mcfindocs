@@ -66,17 +66,17 @@ export function MeetingHome() {
                     variant="ghost"
                     size="icon"
                     onClick={() => router.push('/dashboard')}
-                    className="h-8 w-8"
+                    className="h-8 w-8 dark:hover:bg-gray-800"
                 >
-                    <ArrowLeft className="h-4 w-4 text-gray-900" />
+                    <ArrowLeft className="h-4 w-4 text-gray-900 dark:text-white" />
                 </Button>
-                <h1 className="text-2xl font-bold text-gray-900">Meetings</h1>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Meetings</h1>
             </div>
 
-            <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-8 bg-white rounded-lg p-8 shadow-sm border border-gray-200">
+            <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-8 bg-white dark:bg-gray-800 rounded-lg p-8 shadow-sm border border-gray-200 dark:border-gray-700">
                 <div className="text-center space-y-4">
-                    <h1 className="text-5xl font-medium text-gray-900 tracking-tight">E-Meetings</h1>
-                    <p className="text-xl text-gray-500 max-w-2xl font-light">
+                    <h1 className="text-5xl font-medium text-gray-900 dark:text-white tracking-tight">E-Meetings</h1>
+                    <p className="text-xl text-gray-500 dark:text-gray-400 max-w-2xl font-light">
                         Connect, collaborate, and communicate<br />
                         from anywhere with secure video conferencing.
                     </p>
@@ -92,17 +92,17 @@ export function MeetingHome() {
                                 New meeting
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="w-56 p-1">
-                            <DropdownMenuItem onClick={handleCreateLater} className="py-3 cursor-pointer gap-3">
-                                <LinkIcon className="h-4 w-4 text-gray-500" />
+                        <DropdownMenuContent align="start" className="w-56 p-1 dark:bg-gray-900 dark:border-gray-700">
+                            <DropdownMenuItem onClick={handleCreateLater} className="py-3 cursor-pointer gap-3 dark:hover:bg-gray-800 dark:text-gray-300">
+                                <LinkIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                                 <span>Create a meeting for later</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={handleStartInstantMeeting} className="py-3 cursor-pointer gap-3">
-                                <Plus className="h-4 w-4 text-gray-500" />
+                            <DropdownMenuItem onClick={handleStartInstantMeeting} className="py-3 cursor-pointer gap-3 dark:hover:bg-gray-800 dark:text-gray-300">
+                                <Plus className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                                 <span>Start an instant meeting</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => router.push('/dashboard/meetings/list')} className="py-3 cursor-pointer gap-3">
-                                <Calendar className="h-4 w-4 text-gray-500" />
+                            <DropdownMenuItem onClick={() => router.push('/dashboard/meetings/list')} className="py-3 cursor-pointer gap-3 dark:hover:bg-gray-800 dark:text-gray-300">
+                                <Calendar className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                                 <span>Schedule in Meeting List</span>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -114,7 +114,7 @@ export function MeetingHome() {
                                 placeholder="Enter code or link"
                                 value={joinCode}
                                 onChange={(e) => setJoinCode(e.target.value)}
-                                className="h-12 pl-4 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 text-base"
+                                className="h-12 pl-4 bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 text-base"
                                 onKeyDown={(e) => e.key === 'Enter' && handleJoinMeeting()}
                             />
                         </div>
@@ -129,9 +129,9 @@ export function MeetingHome() {
                     </div>
                 </div>
 
-                <div className="pt-8 border-t border-gray-100 w-full max-w-md text-center">
-                    <p className="text-sm text-gray-400">
-                        Learn more about <a href="#" className="underline text-primary/70 hover:text-primary">E-Meetings</a> security and privacy.
+                <div className="pt-8 border-t border-gray-100 dark:border-gray-700 w-full max-w-md text-center">
+                    <p className="text-sm text-gray-400 dark:text-gray-500">
+                        Learn more about <a href="#" className="underline text-primary/70 hover:text-primary dark:text-primary-foreground/70 dark:hover:text-primary-foreground">E-Meetings</a> security and privacy.
                     </p>
                 </div>
             </div>

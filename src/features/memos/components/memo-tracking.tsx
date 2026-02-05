@@ -102,7 +102,7 @@ export function MemoTracking() {
     };
 
     if (loading) {
-        return <div className="p-8 text-center text-gray-500">Loading tracking information...</div>;
+        return <div className="p-8 text-center text-gray-500 dark:text-gray-400">Loading tracking information...</div>;
     }
 
     return (
@@ -113,89 +113,94 @@ export function MemoTracking() {
                     variant="default"
                     size="icon"
                     onClick={() => router.push('/dashboard')}
-                    className="h-8 w-8 bg-primary text-white hover:bg-primary/90"
+                    className="h-8 w-8 bg-primary text-white hover:bg-primary/90 dark:bg-primary/20 dark:text-primary dark:hover:bg-primary/30"
                 >
                     <ArrowLeft className="h-4 w-4" />
                 </Button>
-                <h1 className="text-2xl font-bold text-foreground">Memo Tracking</h1>
+                <h1 className="text-2xl font-bold text-foreground dark:text-white">Memo Tracking</h1>
             </div>
 
             {/* Controls Row */}
-            <div className="flex justify-between items-center gap-4">
-                <div className="flex gap-2 flex-1 max-w-md">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div className="flex gap-2 flex-1 w-full max-w-md">
                     <div className="relative flex-1">
                         <Input
-                            placeholder="Search"
+                            placeholder="Search by subject, date, or sender..."
                             value={searchQuery}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-                            className="pr-10 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400"
+                            className="pr-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:ring-primary/20 transition-all shadow-sm"
                         />
                         <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                            <Search className="h-4 w-4 text-gray-400" />
+                            <Search className="h-4 w-4 text-gray-400 dark:text-gray-500" />
                         </div>
                     </div>
                 </div>
                 <Button
                     onClick={() => router.push('/dashboard/memos/create')}
-                    className="bg-primary hover:bg-primary/90"
+                    className="bg-primary hover:bg-primary/90 text-white w-full sm:w-auto shadow-md shadow-primary/20 dark:shadow-none transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
                     Create Memo
                 </Button>
             </div>
 
             {/* Table */}
-            <div className="rounded-md border bg-white">
+            <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden shadow-sm">
                 <Table>
                     <TableHeader>
-                        <TableRow className="bg-gray-50/50">
-                            <TableHead className="w-[200px] font-semibold">Reference No</TableHead>
-                            <TableHead className="font-semibold">Subject</TableHead>
-                            <TableHead className="w-[100px] font-semibold">Status</TableHead>
-                            <TableHead className="w-[120px] font-semibold">Initiated Date</TableHead>
-                            <TableHead className="w-[120px] font-semibold">Update Date</TableHead>
-                            <TableHead className="font-semibold">From</TableHead>
+                        <TableRow className="bg-gray-50/50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-700">
+                            <TableHead className="w-[200px] font-bold text-gray-700 dark:text-gray-300 uppercase text-[10px] tracking-wider">Reference No</TableHead>
+                            <TableHead className="font-bold text-gray-700 dark:text-gray-300 uppercase text-[10px] tracking-wider">Subject</TableHead>
+                            <TableHead className="w-[100px] font-bold text-gray-700 dark:text-gray-300 uppercase text-[10px] tracking-wider">Status</TableHead>
+                            <TableHead className="w-[120px] font-bold text-gray-700 dark:text-gray-300 uppercase text-[10px] tracking-wider">Initiated Date</TableHead>
+                            <TableHead className="w-[120px] font-bold text-gray-700 dark:text-gray-300 uppercase text-[10px] tracking-wider">Update Date</TableHead>
+                            <TableHead className="font-bold text-gray-700 dark:text-gray-300 uppercase text-[10px] tracking-wider">From</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {filteredMemos.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={6} className="h-24 text-center">
-                                    No tracking information available
+                            <TableRow className="border-gray-100 dark:border-gray-800">
+                                <TableCell colSpan={6} className="h-32 text-center text-gray-500 dark:text-gray-400">
+                                    <div className="flex flex-col items-center gap-2">
+                                        <Search className="h-8 w-8 opacity-20" />
+                                        <p className="font-medium">No tracking information available</p>
+                                    </div>
                                 </TableCell>
                             </TableRow>
                         ) : (
                             filteredMemos.map((memo: Memo) => (
                                 <TableRow
                                     key={memo._id}
-                                    className="cursor-pointer hover:bg-gray-50"
+                                    className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/30 border-gray-100 dark:border-gray-800 transition-colors"
                                     onClick={() => router.push(`/dashboard/memos/inbox/${memo._id}`)}
                                 >
-                                    <TableCell className="font-medium text-gray-600">
+                                    <TableCell className="font-mono text-[11px] text-gray-500 dark:text-gray-400">
                                         {getReferenceNo(memo)}
                                     </TableCell>
                                     <TableCell className="max-w-[300px]">
-                                        <div className="font-medium text-gray-900 truncate" title={memo.subject}>
+                                        <div className="font-semibold text-gray-900 dark:text-gray-200 truncate" title={memo.subject}>
                                             {memo.subject}
                                         </div>
                                     </TableCell>
                                     <TableCell>
                                         <span className={cn(
-                                            "font-medium",
-                                            getStatusDisplay(memo.status) === 'Closed' ? "text-green-600" : "text-gray-600"
+                                            "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold",
+                                            getStatusDisplay(memo.status) === 'Closed'
+                                                ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                                                : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
                                         )}>
                                             {getStatusDisplay(memo.status)}
                                         </span>
                                     </TableCell>
-                                    <TableCell className="text-gray-600">
+                                    <TableCell className="text-gray-600 dark:text-gray-400">
                                         {memo.createdAt ? new Date(memo.createdAt).toLocaleDateString('en-GB') : memo.date}
                                     </TableCell>
-                                    <TableCell className="text-gray-600">
+                                    <TableCell className="text-gray-600 dark:text-gray-400">
                                         {memo.updatedAt ? new Date(memo.updatedAt).toLocaleDateString('en-GB') : '-'}
                                     </TableCell>
-                                    <TableCell className="text-gray-600 truncate max-w-[200px]" title={memo.from}>
+                                    <TableCell className="text-gray-600 dark:text-gray-400 truncate max-w-[200px]" title={memo.from}>
                                         <div className="flex flex-col">
-                                            <span className="font-medium text-gray-900">{memo.fromName || memo.from}</span>
-                                            {memo.fromDept && <span className="text-xs text-gray-500">{memo.fromDept}</span>}
+                                            <span className="font-medium text-gray-900 dark:text-gray-200">{memo.fromName || memo.from}</span>
+                                            {memo.fromDept && <span className="text-xs text-gray-500 dark:text-gray-400">{memo.fromDept}</span>}
                                         </div>
                                     </TableCell>
                                 </TableRow>
@@ -206,15 +211,15 @@ export function MemoTracking() {
             </div>
 
             {/* Pagination */}
-            <div className="flex items-center justify-end gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center justify-end gap-4 text-sm text-muted-foreground dark:text-gray-400">
                 <span>
                     {startItem}-{endItem} of {totalItems}
                 </span>
                 <div className="flex gap-1">
-                    <Button variant="ghost" size="icon" className="h-8 w-8" disabled={currentPage === 1}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 dark:hover:bg-gray-800" disabled={currentPage === 1}>
                         <ChevronLeft className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8" disabled={currentPage === totalPages}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 dark:hover:bg-gray-800" disabled={currentPage === totalPages}>
                         <ChevronRight className="h-4 w-4" />
                     </Button>
                 </div>

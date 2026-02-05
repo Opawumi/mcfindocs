@@ -96,9 +96,9 @@ export function PDFViewerClient({ file, className }: PDFViewerClientProps) {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center h-full p-8">
-        <p className="text-red-600 mb-4">Error loading PDF: {error}</p>
-        <p className="text-sm text-gray-600">Please try downloading the file instead.</p>
+      <div className="flex flex-col items-center justify-center h-full p-8 bg-white dark:bg-gray-900">
+        <p className="text-red-600 dark:text-red-500 mb-4">Error loading PDF: {error}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400">Please try downloading the file instead.</p>
       </div>
     );
   }
@@ -106,10 +106,10 @@ export function PDFViewerClient({ file, className }: PDFViewerClientProps) {
   // Wait for PDF module to load
   if (!pdfModule) {
     return (
-      <div className="flex items-center justify-center h-full">
+      <div className="flex items-center justify-center h-full bg-white dark:bg-gray-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-          <p className="text-sm text-gray-600">Loading PDF viewer...</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">Loading PDF viewer...</p>
         </div>
       </div>
     );
@@ -130,8 +130,8 @@ export function PDFViewerClient({ file, className }: PDFViewerClientProps) {
 
   if (!normalizedFile) {
     return (
-      <div className="flex flex-col items-center justify-center h-full p-8">
-        <p className="text-red-600 mb-4">No file provided</p>
+      <div className="flex flex-col items-center justify-center h-full p-8 bg-white dark:bg-gray-900">
+        <p className="text-red-600 dark:text-red-500 mb-4">No file provided</p>
       </div>
     );
   }
@@ -139,17 +139,18 @@ export function PDFViewerClient({ file, className }: PDFViewerClientProps) {
   return (
     <div className={cn('flex flex-col h-full', className)}>
       {/* Controls */}
-      <div className="flex items-center justify-between p-4 border-b bg-white shrink-0">
+      <div className="flex items-center justify-between p-4 border-b dark:border-gray-800 bg-white dark:bg-gray-900 shrink-0">
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
             size="sm"
             onClick={goToPrevPage}
             disabled={pageNumber <= 1}
+            className="dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <span className="text-sm font-medium px-3">
+          <span className="text-sm font-medium px-3 dark:text-gray-200">
             Page {pageNumber} of {numPages || '...'}
           </span>
           <Button
@@ -157,34 +158,35 @@ export function PDFViewerClient({ file, className }: PDFViewerClientProps) {
             size="sm"
             onClick={goToNextPage}
             disabled={!numPages || pageNumber >= (numPages || 1)}
+            className="dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={zoomOut} disabled={scale <= 0.5}>
+          <Button variant="outline" size="sm" onClick={zoomOut} disabled={scale <= 0.5} className="dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
             <ZoomOut className="h-4 w-4" />
           </Button>
-          <span className="text-sm font-medium px-2 min-w-[60px] text-center">
+          <span className="text-sm font-medium px-2 min-w-[60px] text-center dark:text-gray-200">
             {Math.round(scale * 100)}%
           </span>
-          <Button variant="outline" size="sm" onClick={zoomIn} disabled={scale >= 3.0}>
+          <Button variant="outline" size="sm" onClick={zoomIn} disabled={scale >= 3.0} className="dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
             <ZoomIn className="h-4 w-4" />
           </Button>
-          <Button variant="outline" size="sm" onClick={rotate}>
+          <Button variant="outline" size="sm" onClick={rotate} className="dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
             <RotateCw className="h-4 w-4" />
           </Button>
         </div>
       </div>
 
       {/* PDF Viewer */}
-      <div className="flex-1 overflow-auto bg-gray-100 flex items-start justify-center p-4">
+      <div className="flex-1 overflow-auto bg-gray-100 dark:bg-gray-950 flex items-start justify-center p-4">
         {loading && (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-              <p className="text-sm text-gray-600">Loading PDF...</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Loading PDF...</p>
             </div>
           </div>
         )}
@@ -196,9 +198,9 @@ export function PDFViewerClient({ file, className }: PDFViewerClientProps) {
           className="flex flex-col items-center"
           options={options}
           error={
-            <div className="flex flex-col items-center justify-center p-8">
-              <p className="text-red-600 mb-2">Failed to load PDF document</p>
-              <p className="text-sm text-gray-600">Please check the file URL or try downloading the file.</p>
+            <div className="flex flex-col items-center justify-center p-8 bg-white dark:bg-gray-900 rounded-lg shadow-sm border dark:border-gray-800">
+              <p className="text-red-600 dark:text-red-500 mb-2">Failed to load PDF document</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Please check the file URL or try downloading the file.</p>
             </div>
           }
         >
@@ -215,9 +217,9 @@ export function PDFViewerClient({ file, className }: PDFViewerClientProps) {
               </div>
             }
             error={
-              <div className="flex flex-col items-center justify-center p-8">
-                <p className="text-red-600 mb-2">Failed to render page {pageNumber}</p>
-                <p className="text-sm text-gray-600">Please try a different page.</p>
+              <div className="flex flex-col items-center justify-center p-8 bg-white dark:bg-gray-900 rounded-lg shadow-sm border dark:border-gray-800">
+                <p className="text-red-600 dark:text-red-500 mb-2">Failed to render page {pageNumber}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Please try a different page.</p>
               </div>
             }
           />

@@ -22,22 +22,34 @@ interface FolderProviderProps {
 export function FolderProvider({ children }: FolderProviderProps) {
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
   const [currentFolder, setCurrentFolder] = useState<Folder | null>(null);
-  const [folders, setFolders] = useState<Folder[]>(mockFolders);
+  const [folders, setFolders] = useState<Folder[]>([]);
 
-  // Refresh folders from mock data (in real app, this would be an API call)
-  const refreshFolders = () => {
-    // Create a new array reference to trigger re-renders
-    // The service modifies mockFolders in place, so we need a new reference
-    setFolders([...mockFolders]);
-    
-    // Update current folder if it still exists
-    if (currentFolderId) {
-      const updatedFolder = mockFolders.find(f => f.id === currentFolderId);
-      setCurrentFolder(updatedFolder || null);
+  // Refresh folders from API (fetches real document counts from database)
+  const refreshFolders = async () => {
+    try {
+      const response = await fetch('/api/folders');
+      if (response.ok) {
+        const data = await response.json();
+        setFolders(data.folders || []);
+
+        // Update current folder if it still exists
+        if (currentFolderId) {
+          const updatedFolder = (data.folders || []).find((f: Folder) => f.id === currentFolderId);
+          setCurrentFolder(updatedFolder || null);
+        }
+      } else {
+        console.error('Failed to fetch folders');
+        // Fallback to mock data if API fails
+        setFolders(mockFolders);
+      }
+    } catch (error) {
+      console.error('Error fetching folders:', error);
+      // Fallback to mock data if API fails
+      setFolders(mockFolders);
     }
   };
 
-  // Initial load and periodic refresh
+  // Initial load
   useEffect(() => {
     refreshFolders();
   }, []);

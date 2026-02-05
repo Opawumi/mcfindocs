@@ -5,6 +5,7 @@ import { Upload, Filter, ArrowLeft, Search, LayoutGrid, Library } from 'lucide-r
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 import {
   DocumentGrid,
   DocumentUploadDialog,
@@ -119,25 +120,28 @@ export default function DocumentsPage() {
             variant="ghost"
             size="icon"
             onClick={() => router.push('/dashboard')}
-            className="h-8 w-8 shrink-0"
+            className="h-8 w-8 shrink-0 dark:hover:bg-gray-700"
           >
-            <ArrowLeft className="h-4 w-4 text-dark hover:text-white" />
+            <ArrowLeft className="h-4 w-4 text-dark dark:text-white" />
           </Button>
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-dark truncate">Documents</h1>
-            <p className="text-xs sm:text-sm text-dark mt-1 line-clamp-1">
+            <h1 className="text-xl sm:text-2xl font-bold text-dark dark:text-white truncate">Documents</h1>
+            <p className="text-xs sm:text-sm text-dark dark:text-gray-400 mt-1 line-clamp-1">
               Browse and manage organizational documents
             </p>
           </div>
         </div>
         <div className="flex gap-2 w-full sm:w-auto">
           {!selectedCategoryId && !selectedFolderId && (
-            <div className="flex bg-muted/20 p-1 rounded-lg border mr-2">
+            <div className="flex bg-muted/20 dark:bg-gray-800/50 p-1 rounded-lg border dark:border-gray-700 mr-2">
               <Button
                 variant={viewMode === 'shelves' ? 'secondary' : 'ghost'}
                 size="sm"
                 onClick={() => setViewMode('shelves')}
-                className="h-7 px-2 text-xs"
+                className={cn(
+                  "h-7 px-2 text-xs",
+                  viewMode === 'shelves' ? "dark:bg-gray-700 dark:text-white" : "dark:text-gray-400 dark:hover:bg-gray-700"
+                )}
                 title="Shelf View"
               >
                 <Library className="h-3.5 w-3.5 mr-1" />
@@ -147,7 +151,10 @@ export default function DocumentsPage() {
                 variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
                 size="sm"
                 onClick={() => setViewMode('grid')}
-                className="h-7 px-2 text-xs"
+                className={cn(
+                  "h-7 px-2 text-xs",
+                  viewMode === 'grid' ? "dark:bg-gray-700 dark:text-white" : "dark:text-gray-400 dark:hover:bg-gray-700"
+                )}
                 title="Grid View"
               >
                 <LayoutGrid className="h-3.5 w-3.5 mr-1" />
@@ -155,11 +162,11 @@ export default function DocumentsPage() {
               </Button>
             </div>
           )}
-          <Button variant="outline" size="sm" className="flex-1 sm:flex-none text-xs h-9">
+          <Button variant="outline" size="sm" className="flex-1 sm:flex-none text-xs h-9 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700">
             <Filter className="h-3.5 w-3.5 sm:mr-2" />
             <span className="hidden sm:inline">Filters</span>
           </Button>
-          <Button size="sm" onClick={() => setUploadDialogOpen(true)} className="flex-1 sm:flex-none text-xs h-9">
+          <Button size="sm" onClick={() => setUploadDialogOpen(true)} className="flex-1 sm:flex-none text-xs h-9 dark:bg-primary dark:text-white">
             <Upload className="h-3.5 w-3.5 sm:mr-2" />
             <span className="hidden sm:inline">Upload</span>
           </Button>
@@ -168,13 +175,13 @@ export default function DocumentsPage() {
 
       {/* Search Bar */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
         <Input
           type="text"
           placeholder="Search documents..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10 h-10 text-sm"
+          className="pl-10 h-10 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-500"
         />
       </div>
 
@@ -182,10 +189,10 @@ export default function DocumentsPage() {
       {(currentCategory || currentFolder) && (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
           <div>
-            <h2 className="text-base sm:text-lg font-semibold text-dark truncate">
+            <h2 className="text-base sm:text-lg font-semibold text-dark dark:text-white truncate">
               {currentCategory ? currentCategory.name : currentFolder?.name}
             </h2>
-            <p className="text-xs sm:text-sm text-dark/60">
+            <p className="text-xs sm:text-sm text-dark/60 dark:text-gray-400">
               {searchedDocuments.length} {searchedDocuments.length === 1 ? 'document' : 'documents'}
             </p>
           </div>
@@ -196,7 +203,7 @@ export default function DocumentsPage() {
               setSelectedCategoryId(null);
               setSelectedFolderId(null);
             }}
-            className="text-dark/60 hover:text-dark text-xs h-8 w-full sm:w-auto"
+            className="text-dark/60 hover:text-dark dark:text-gray-400 dark:hover:text-white text-xs h-8 w-full sm:w-auto"
           >
             Clear filter
           </Button>

@@ -85,27 +85,6 @@ export const useUIStore = create<UIState>((set, get) => ({
   // Theme actions
   setTheme: (theme) => {
     set({ theme });
-
-    // Apply theme to document
-    if (typeof window !== "undefined") {
-      const root = window.document.documentElement;
-
-      if (theme === "dark") {
-        root.classList.add("dark");
-      } else if (theme === "light") {
-        root.classList.remove("dark");
-      } else {
-        // System theme
-        const prefersDark = window.matchMedia(
-          "(prefers-color-scheme: dark)"
-        ).matches;
-        if (prefersDark) {
-          root.classList.add("dark");
-        } else {
-          root.classList.remove("dark");
-        }
-      }
-    }
   },
 
   // Notification actions

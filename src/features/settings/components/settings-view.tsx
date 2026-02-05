@@ -9,19 +9,26 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, User, Bell, Lock, Globe, Moon } from 'lucide-react';
+import { ArrowLeft, User, Bell, Lock, Globe, Moon, Sun } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
 import { getInitials } from '@/lib/utils';
+import { useTheme } from 'next-themes';
 
 export function SettingsView() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { data: session, update } = useSession();
+    const { theme, setTheme, resolvedTheme } = useTheme();
     const [activeTab, setActiveTab] = useState('profile');
+    const [mounted, setMounted] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     // Profile State
     const [firstName, setFirstName] = useState('');
@@ -191,13 +198,13 @@ export function SettingsView() {
                     variant="ghost"
                     size="icon"
                     onClick={() => router.push('/dashboard')}
-                    className="h-8 w-8"
+                    className="h-8 w-8 dark:hover:bg-gray-700"
                 >
-                    <ArrowLeft className="h-4 w-4 text-gray-900" />
+                    <ArrowLeft className="h-4 w-4 text-gray-900 dark:text-white" />
                 </Button>
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-                    <p className="text-sm text-gray-500">Manage your account preferences</p>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Settings</h1>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Manage your account preferences</p>
                 </div>
             </div>
 
@@ -205,31 +212,31 @@ export function SettingsView() {
                 <div className="flex flex-col md:flex-row gap-6">
                     {/* Sidebar for Tabs */}
                     <aside className="w-full md:w-64 space-y-4">
-                        <TabsList className="flex flex-col h-auto w-full bg-transparent p-0 gap-1 bg-white">
+                        <TabsList className="flex flex-col h-auto w-full bg-transparent p-0 gap-1 bg-white dark:bg-gray-800">
                             <TabsTrigger
                                 value="profile"
-                                className="w-full justify-start px-4 py-3 h-auto data-[state=active]:bg-primary/10 data-[state=active]:text-primary text-gray-600 hover:bg-gray-50 rounded-lg justify-start gap-3"
+                                className="w-full justify-start px-4 py-3 h-auto data-[state=active]:bg-primary/10 data-[state=active]:text-primary text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg justify-start gap-3"
                             >
                                 <User className="h-4 w-4" />
                                 Profile
                             </TabsTrigger>
                             <TabsTrigger
                                 value="notifications"
-                                className="w-full justify-start px-4 py-3 h-auto data-[state=active]:bg-primary/10 data-[state=active]:text-primary text-gray-600 hover:bg-gray-50 rounded-lg justify-start gap-3"
+                                className="w-full justify-start px-4 py-3 h-auto data-[state=active]:bg-primary/10 data-[state=active]:text-primary text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg justify-start gap-3"
                             >
                                 <Bell className="h-4 w-4" />
                                 Notifications
                             </TabsTrigger>
                             <TabsTrigger
                                 value="security"
-                                className="w-full justify-start px-4 py-3 h-auto data-[state=active]:bg-primary/10 data-[state=active]:text-primary text-gray-600 hover:bg-gray-50 rounded-lg justify-start gap-3"
+                                className="w-full justify-start px-4 py-3 h-auto data-[state=active]:bg-primary/10 data-[state=active]:text-primary text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg justify-start gap-3"
                             >
                                 <Lock className="h-4 w-4" />
                                 Security
                             </TabsTrigger>
                             <TabsTrigger
                                 value="appearance"
-                                className="w-full justify-start px-4 py-3 h-auto data-[state=active]:bg-primary/10 data-[state=active]:text-primary text-gray-600 hover:bg-gray-50 rounded-lg justify-start gap-3"
+                                className="w-full justify-start px-4 py-3 h-auto data-[state=active]:bg-primary/10 data-[state=active]:text-primary text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg justify-start gap-3"
                             >
                                 <Moon className="h-4 w-4" />
                                 Appearance
@@ -241,10 +248,10 @@ export function SettingsView() {
                     <div className="flex-1">
                         {/* Profile Tab */}
                         <TabsContent value="profile" className="space-y-6 mt-0">
-                            <Card className="bg-white border-gray-200 shadow-sm">
+                            <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm">
                                 <CardHeader>
-                                    <CardTitle className="text-gray-900">Profile Information</CardTitle>
-                                    <CardDescription>Update your photo and personal details.</CardDescription>
+                                    <CardTitle className="text-gray-900 dark:text-white">Profile Information</CardTitle>
+                                    <CardDescription className="dark:text-gray-400">Update your photo and personal details.</CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-6">
                                     <div className="flex items-center gap-6">
@@ -264,65 +271,65 @@ export function SettingsView() {
                                             />
                                             <Button
                                                 variant="outline"
-                                                className="text-gray-900 border-gray-300"
+                                                className="text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
                                                 onClick={() => fileInputRef.current?.click()}
                                                 disabled={isImageUploading}
                                             >
                                                 {isImageUploading ? 'Uploading...' : 'Change Photo'}
                                             </Button>
-                                            <p className="text-xs text-gray-500">JPG, GIF or PNG. Max 1MB.</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">JPG, GIF or PNG. Max 1MB.</p>
                                         </div>
                                     </div>
 
                                     <div className="grid gap-4 md:grid-cols-2">
                                         <div className="space-y-2">
-                                            <Label htmlFor="firstName" className="text-gray-900">First name</Label>
+                                            <Label htmlFor="firstName" className="text-gray-900 dark:text-gray-200">First name</Label>
                                             <Input
                                                 id="firstName"
                                                 value={firstName}
                                                 onChange={(e) => setFirstName(e.target.value)}
-                                                className="bg-white border-gray-300 text-gray-900"
+                                                className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="lastName" className="text-gray-900">Last name</Label>
+                                            <Label htmlFor="lastName" className="text-gray-900 dark:text-gray-200">Last name</Label>
                                             <Input
                                                 id="lastName"
                                                 value={lastName}
                                                 onChange={(e) => setLastName(e.target.value)}
-                                                className="bg-white border-gray-300 text-gray-900"
+                                                className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100"
                                             />
                                         </div>
                                     </div>
 
                                     <div className="grid gap-4 md:grid-cols-2">
                                         <div className="space-y-2">
-                                            <Label htmlFor="email" className="text-gray-900">Email</Label>
-                                            <Input id="email" defaultValue={user?.email} disabled className="bg-gray-50 border-gray-300 text-gray-500 cursor-not-allowed" />
+                                            <Label htmlFor="email" className="text-gray-900 dark:text-gray-200">Email</Label>
+                                            <Input id="email" defaultValue={user?.email} disabled className="bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed" />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="role" className="text-gray-900">Role</Label>
-                                            <Input id="role" defaultValue={user?.role} disabled className="bg-gray-50 border-gray-300 text-gray-500 capitalize cursor-not-allowed" />
+                                            <Label htmlFor="role" className="text-gray-900 dark:text-gray-200">Role</Label>
+                                            <Input id="role" defaultValue={user?.role} disabled className="bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 capitalize cursor-not-allowed" />
                                         </div>
                                     </div>
 
                                     <div className="grid gap-4 md:grid-cols-2">
                                         <div className="space-y-2">
-                                            <Label htmlFor="dept" className="text-gray-900">Department</Label>
+                                            <Label htmlFor="dept" className="text-gray-900 dark:text-gray-200">Department</Label>
                                             <Input
                                                 id="dept"
                                                 value={department}
                                                 onChange={(e) => setDepartment(e.target.value)}
-                                                className="bg-white border-gray-300 text-gray-900"
+                                                className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="designation" className="text-gray-900">Designation</Label>
+                                            <Label htmlFor="designation" className="text-gray-900 dark:text-gray-200">Designation</Label>
                                             <Input
                                                 id="designation"
                                                 value={designation}
                                                 onChange={(e) => setDesignation(e.target.value)}
-                                                className="bg-white border-gray-300 text-gray-900"
+                                                className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100"
                                             />
                                         </div>
                                     </div>
@@ -337,34 +344,34 @@ export function SettingsView() {
 
                         {/* Notifications Tab */}
                         <TabsContent value="notifications" className="space-y-6 mt-0">
-                            <Card className="bg-white border-gray-200 shadow-sm">
+                            <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm">
                                 <CardHeader>
-                                    <CardTitle className="text-gray-900">Notification Preferences</CardTitle>
-                                    <CardDescription>Choose what you want to be notified about.</CardDescription>
+                                    <CardTitle className="text-gray-900 dark:text-white">Notification Preferences</CardTitle>
+                                    <CardDescription className="dark:text-gray-400">Choose what you want to be notified about.</CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-6">
                                     <div className="space-y-4">
-                                        <h3 className="text-sm font-medium text-gray-900">Email Notifications</h3>
+                                        <h3 className="text-sm font-medium text-gray-900 dark:text-white">Email Notifications</h3>
                                         <div className="flex items-center justify-between">
                                             <Label htmlFor="marketing" className="flex flex-col space-y-1">
-                                                <span className="text-gray-900 font-medium">New Documents</span>
-                                                <span className="text-gray-500 font-normal text-sm">Receive emails when new documents are shared with you.</span>
+                                                <span className="text-gray-900 dark:text-white font-medium">New Documents</span>
+                                                <span className="text-gray-500 dark:text-gray-400 font-normal text-sm">Receive emails when new documents are shared with you.</span>
                                             </Label>
                                             <Switch id="marketing" defaultChecked />
                                         </div>
-                                        <Separator />
+                                        <Separator className="dark:bg-gray-700" />
                                         <div className="flex items-center justify-between">
                                             <Label htmlFor="social" className="flex flex-col space-y-1">
-                                                <span className="text-gray-900 font-medium">Memo Updates</span>
-                                                <span className="text-gray-500 font-normal text-sm">Receive emails about status changes on your memos.</span>
+                                                <span className="text-gray-900 dark:text-white font-medium">Memo Updates</span>
+                                                <span className="text-gray-500 dark:text-gray-400 font-normal text-sm">Receive emails about status changes on your memos.</span>
                                             </Label>
                                             <Switch id="social" defaultChecked />
                                         </div>
-                                        <Separator />
+                                        <Separator className="dark:bg-gray-700" />
                                         <div className="flex items-center justify-between">
                                             <Label htmlFor="security" className="flex flex-col space-y-1">
-                                                <span className="text-gray-900 font-medium">Meeting Invites</span>
-                                                <span className="text-gray-500 font-normal text-sm">Receive emails when you are invited to a meeting.</span>
+                                                <span className="text-gray-900 dark:text-white font-medium">Meeting Invites</span>
+                                                <span className="text-gray-500 dark:text-gray-400 font-normal text-sm">Receive emails when you are invited to a meeting.</span>
                                             </Label>
                                             <Switch id="security" defaultChecked />
                                         </div>
@@ -378,40 +385,40 @@ export function SettingsView() {
 
                         {/* Security Tab */}
                         <TabsContent value="security" className="space-y-6 mt-0">
-                            <Card className="bg-white border-gray-200 shadow-sm">
+                            <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm">
                                 <CardHeader>
-                                    <CardTitle className="text-gray-900">Security</CardTitle>
-                                    <CardDescription>Manage your password and security settings.</CardDescription>
+                                    <CardTitle className="text-gray-900 dark:text-white">Security</CardTitle>
+                                    <CardDescription className="dark:text-gray-400">Manage your password and security settings.</CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-6">
                                     <div className="space-y-2">
-                                        <Label htmlFor="current" className="text-gray-900">Current Password</Label>
+                                        <Label htmlFor="current" className="text-gray-900 dark:text-gray-200">Current Password</Label>
                                         <Input
                                             id="current"
                                             type="password"
                                             value={currentPassword}
                                             onChange={(e) => setCurrentPassword(e.target.value)}
-                                            className="bg-white border-gray-300 text-gray-900"
+                                            className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100"
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="new" className="text-gray-900">New Password</Label>
+                                        <Label htmlFor="new" className="text-gray-900 dark:text-gray-200">New Password</Label>
                                         <Input
                                             id="new"
                                             type="password"
                                             value={newPassword}
                                             onChange={(e) => setNewPassword(e.target.value)}
-                                            className="bg-white border-gray-300 text-gray-900"
+                                            className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100"
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="confirm" className="text-gray-900">Confirm Password</Label>
+                                        <Label htmlFor="confirm" className="text-gray-900 dark:text-gray-200">Confirm Password</Label>
                                         <Input
                                             id="confirm"
                                             type="password"
                                             value={confirmPassword}
                                             onChange={(e) => setConfirmPassword(e.target.value)}
-                                            className="bg-white border-gray-300 text-gray-900"
+                                            className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100"
                                         />
                                     </div>
                                 </CardContent>
@@ -425,18 +432,44 @@ export function SettingsView() {
 
                         {/* Appearance Tab */}
                         <TabsContent value="appearance" className="space-y-6 mt-0">
-                            <Card className="bg-white border-gray-200 shadow-sm">
+                            <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm">
                                 <CardHeader>
-                                    <CardTitle className="text-gray-900">Appearance</CardTitle>
-                                    <CardDescription>Customize the interface of the application.</CardDescription>
+                                    <CardTitle className="text-gray-900 dark:text-white">Appearance</CardTitle>
+                                    <CardDescription className="dark:text-gray-400">Customize the interface of the application.</CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-6">
                                     <div className="flex items-center justify-between">
                                         <Label htmlFor="darkMode" className="flex flex-col space-y-1">
-                                            <span className="text-gray-900 font-medium">Dark Mode</span>
-                                            <span className="text-gray-500 font-normal text-sm">Enable dark mode for the application. (Currently disabled by admin policy)</span>
+                                            <span className="text-gray-900 dark:text-white font-medium">Dark Mode</span>
+                                            <span className="text-gray-500 dark:text-gray-400 font-normal text-sm">Enable dark mode for a comfortable viewing experience in low light.</span>
                                         </Label>
-                                        <Switch id="darkMode" disabled checked={false} />
+                                        {mounted && (
+                                            <Switch
+                                                id="darkMode"
+                                                checked={resolvedTheme === 'dark'}
+                                                onCheckedChange={(checked) => {
+                                                    setTheme(checked ? 'dark' : 'light');
+                                                    toast.success(checked ? 'Dark mode enabled' : 'Light mode enabled');
+                                                }}
+                                            />
+                                        )}
+                                    </div>
+                                    <Separator className="dark:bg-gray-700" />
+                                    <div className="flex items-center justify-between">
+                                        <Label htmlFor="systemTheme" className="flex flex-col space-y-1">
+                                            <span className="text-gray-900 dark:text-white font-medium">Use System Theme</span>
+                                            <span className="text-gray-500 dark:text-gray-400 font-normal text-sm">Automatically match your operating system's theme preference.</span>
+                                        </Label>
+                                        {mounted && (
+                                            <Switch
+                                                id="systemTheme"
+                                                checked={theme === 'system'}
+                                                onCheckedChange={(checked) => {
+                                                    setTheme(checked ? 'system' : resolvedTheme);
+                                                    toast.success(checked ? 'Using system theme' : 'Using manual theme');
+                                                }}
+                                            />
+                                        )}
                                     </div>
                                 </CardContent>
                             </Card>

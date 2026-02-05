@@ -30,7 +30,7 @@ export function CategorySelector({
   const [isCreatingSub, setIsCreatingSub] = useState(false);
   const [newParentName, setNewParentName] = useState('');
   const [newSubName, setNewSubName] = useState('');
-  
+
   // Store created category names to display them
   const [createdParentName, setCreatedParentName] = useState('');
   const [createdSubName, setCreatedSubName] = useState('');
@@ -41,9 +41,9 @@ export function CategorySelector({
 
   const handleCreateParentCategory = () => {
     if (!newParentName.trim()) return;
-    
+
     console.log('Creating parent category:', newParentName);
-    
+
     const newId = `cat-new-${Date.now()}`;
     setCreatedParentName(newParentName); // Store the name
     onChange(newId);
@@ -53,9 +53,9 @@ export function CategorySelector({
 
   const handleCreateSubCategory = () => {
     if (!newSubName.trim()) return;
-    
+
     console.log('Creating sub-category:', newSubName, 'under', value);
-    
+
     const newId = `cat-new-${Date.now()}`;
     setCreatedSubName(newSubName); // Store the name
     onSubCategoryChange(newId);
@@ -80,7 +80,7 @@ export function CategorySelector({
     <div className="grid grid-cols-2 gap-4">
       {/* Parent Category */}
       <div>
-        <Label htmlFor="parent-category">Category *</Label>
+        <Label htmlFor="parent-category" className="dark:text-gray-200">Category *</Label>
         {!isCreatingParent ? (
           <Select
             value={value}
@@ -95,17 +95,17 @@ export function CategorySelector({
               }
             }}
           >
-            <SelectTrigger>
+            <SelectTrigger className="dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200">
               <SelectValue placeholder="Select category">
                 {value && getParentDisplayName()}
               </SelectValue>
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="create-new" className="text-primary font-medium">
+            <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+              <SelectItem value="create-new" className="text-primary font-medium dark:text-primary dark:hover:bg-gray-700">
                 + Create New Category
               </SelectItem>
               {mockCategories.filter(cat => cat.level === 0).map((category) => (
-                <SelectItem key={category.id} value={category.id}>
+                <SelectItem key={category.id} value={category.id} className="dark:text-gray-200 dark:hover:bg-gray-700">
                   {category.name}
                 </SelectItem>
               ))}
@@ -125,6 +125,7 @@ export function CategorySelector({
                 }
               }}
               autoFocus
+              className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
             />
             <div className="flex gap-2">
               <Button
@@ -132,7 +133,7 @@ export function CategorySelector({
                 size="sm"
                 onClick={handleCreateParentCategory}
                 disabled={!newParentName.trim()}
-                className="flex-1"
+                className="flex-1 dark:bg-primary dark:text-white"
               >
                 Create
               </Button>
@@ -144,7 +145,7 @@ export function CategorySelector({
                   setIsCreatingParent(false);
                   setNewParentName('');
                 }}
-                className="flex-1"
+                className="flex-1 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
               >
                 Cancel
               </Button>
@@ -156,7 +157,7 @@ export function CategorySelector({
       {/* Sub-Category */}
       {value && value !== 'create-new' && (
         <div>
-          <Label htmlFor="sub-category">Sub-Category</Label>
+          <Label htmlFor="sub-category" className="dark:text-gray-200">Sub-Category</Label>
           {!isCreatingSub ? (
             <Select
               value={subCategoryValue}
@@ -169,17 +170,17 @@ export function CategorySelector({
                 }
               }}
             >
-              <SelectTrigger>
+              <SelectTrigger className="dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200">
                 <SelectValue placeholder="Select sub-category (optional)">
                   {subCategoryValue && getSubDisplayName()}
                 </SelectValue>
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="create-new" className="text-primary font-medium">
+              <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                <SelectItem value="create-new" className="text-primary font-medium dark:text-primary dark:hover:bg-gray-700">
                   + Create New Sub-Category
                 </SelectItem>
                 {subCategories.map((category) => (
-                  <SelectItem key={category.id} value={category.id}>
+                  <SelectItem key={category.id} value={category.id} className="dark:text-gray-200 dark:hover:bg-gray-700">
                     {category.name}
                   </SelectItem>
                 ))}
@@ -199,6 +200,7 @@ export function CategorySelector({
                   }
                 }}
                 autoFocus
+                className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
               />
               <div className="flex gap-2">
                 <Button
@@ -206,7 +208,7 @@ export function CategorySelector({
                   size="sm"
                   onClick={handleCreateSubCategory}
                   disabled={!newSubName.trim()}
-                  className="flex-1"
+                  className="flex-1 dark:bg-primary dark:text-white"
                 >
                   Create
                 </Button>
@@ -218,7 +220,7 @@ export function CategorySelector({
                     setIsCreatingSub(false);
                     setNewSubName('');
                   }}
-                  className="flex-1"
+                  className="flex-1 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
                 >
                   Cancel
                 </Button>

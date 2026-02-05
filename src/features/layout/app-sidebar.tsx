@@ -20,7 +20,7 @@ import { useUIStore } from '@/stores';
 import { useSession, signOut } from 'next-auth/react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { mockCategories } from '@/lib/mock-data';
 import type { Category } from '@/lib/types';
 import { FolderTree, CreateFolderDialog } from '@/features/folders';
@@ -67,40 +67,6 @@ interface NavItem {
   badge?: number;
 }
 
-const navItems: NavItem[] = [
-  {
-    title: 'Dashboard',
-    href: '/dashboard',
-    icon: LayoutDashboard,
-  },
-  {
-    title: 'Documents',
-    href: '/dashboard/documents',
-    icon: FileText,
-  },
-  {
-    title: 'My Folders',
-    href: '/dashboard/my-folders',
-    icon: Folder,
-  },
-  {
-    title: 'E-Memos',
-    href: '/dashboard/memos',
-    icon: Mail,
-    badge: 3,
-  },
-  {
-    title: 'E-Meetings',
-    href: '/dashboard/meetings',
-    icon: Video,
-  },
-  {
-    title: 'E-Senate',
-    href: '/dashboard/senate',
-    icon: GraduationCap,
-  },
-];
-
 const adminNavItems: NavItem[] = [
   {
     title: 'Users',
@@ -141,7 +107,7 @@ function CategoryTreeItem({ category, level = 0 }: { category: CategoryWithChild
           level > 0 && 'pl-8 justify-self-end',
           isSelected
             ? 'bg-primary text-white'
-            : 'hover:bg-gray-100 text-gray-700'
+            : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
         )}
       >
         {hasChildren && (
@@ -164,7 +130,7 @@ function CategoryTreeItem({ category, level = 0 }: { category: CategoryWithChild
         {category.documentCount && category.documentCount > 0 && (
           <span className={cn(
             "text-xs",
-            isSelected ? "text-white/80" : "text-gray-500"
+            isSelected ? "text-white/80" : "text-gray-500 dark:text-gray-400"
           )}>
             {category.documentCount}
           </span>
@@ -183,10 +149,24 @@ function CategoryTreeItem({ category, level = 0 }: { category: CategoryWithChild
 }
 
 function CategoryTree() {
-  const categories = buildCategoryTree(mockCategories);
   const { selectedCategoryId, setSelectedCategoryId } = useUIStore();
   const router = useRouter();
   const pathname = usePathname();
+  const [categories, setCategories] = useState<Category[]>(mockCategories);
+
+  useEffect(() => {
+    // Fetch categories with real counts from API
+    fetch('/api/sidebar/data')
+      .then(res => res.json())
+      .then(data => {
+        if (data.categories) {
+          setCategories(data.categories);
+        }
+      })
+      .catch(err => console.error('Failed to fetch categories:', err));
+  }, []);
+
+  const categoryTree = buildCategoryTree(categories);
 
   const handleAllDocuments = () => {
     if (!pathname.startsWith('/dashboard/documents')) {
@@ -198,7 +178,7 @@ function CategoryTree() {
   return (
     <div className="space-y-1">
       <div className="px-3 py-2">
-        <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+        <h2 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
           Categories
         </h2>
       </div>
@@ -210,13 +190,13 @@ function CategoryTree() {
           'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
           selectedCategoryId === null
             ? 'bg-primary text-white'
-            : 'hover:bg-gray-100 text-gray-700'
+            : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
         )}
       >
         <span className="flex-1 text-left">All Documents</span>
       </button>
 
-      {categories.map((category) => (
+      {categoryTree.map((category) => (
         <CategoryTreeItem key={category.id} category={category} />
       ))}
     </div>
@@ -228,6 +208,53 @@ function MainNavigation() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const isAdmin = (session?.user as any)?.role === 'admin';
+  const [unreadMemos, setUnreadMemos] = useState(0);
+
+  useEffect(() => {
+    // Fetch real-time sidebar data
+    fetch('/api/sidebar/data')
+      .then(res => res.json())
+      .then(data => {
+        if (data.unreadMemos !== undefined) {
+          setUnreadMemos(data.unreadMemos);
+        }
+      })
+      .catch(err => console.error('Failed to fetch sidebar data:', err));
+  }, []);
+
+  const navItems: NavItem[] = [
+    {
+      title: 'Dashboard',
+      href: '/dashboard',
+      icon: LayoutDashboard,
+    },
+    {
+      title: 'Documents',
+      href: '/dashboard/documents',
+      icon: FileText,
+    },
+    {
+      title: 'My Folders',
+      href: '/dashboard/my-folders',
+      icon: Folder,
+    },
+    {
+      title: 'E-Memos',
+      href: '/dashboard/memos',
+      icon: Mail,
+      badge: unreadMemos > 0 ? unreadMemos : undefined,
+    },
+    {
+      title: 'E-Meetings',
+      href: '/dashboard/meetings',
+      icon: Video,
+    },
+    {
+      title: 'E-Senate',
+      href: '/dashboard/senate',
+      icon: GraduationCap,
+    },
+  ];
 
   return (
     <>
@@ -244,7 +271,7 @@ function MainNavigation() {
                 'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors relative',
                 isActive
                   ? 'bg-primary text-white'
-                  : 'text-gray-700 hover:bg-gray-100'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
               )}
             >
               <Icon className="h-5 w-5 shrink-0" />
@@ -264,8 +291,8 @@ function MainNavigation() {
 
       {/* Admin Section */}
       <>
-        <Separator className="my-4" />
-        <p className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+        <Separator className="my-4 dark:bg-gray-700" />
+        <p className="px-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
           Admin
         </p>
 
@@ -282,7 +309,7 @@ function MainNavigation() {
                   'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                   isActive
                     ? 'bg-primary text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                 )}
               >
                 <Icon className="h-5 w-5 shrink-0" />
@@ -333,10 +360,10 @@ function MemoNavigation() {
 
   return (
     <>
-      <div className="px-3 py-2 border-b border-gray-200">
+      <div className="px-3 py-2 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-2">
-          <Mail className="h-5 w-5 text-gray-600" />
-          <h2 className="text-sm font-semibold text-gray-700">Memo</h2>
+          <Mail className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-200">E-Memos</h2>
         </div>
       </div>
 
@@ -351,8 +378,8 @@ function MemoNavigation() {
               className={cn(
                 'block px-4 py-2 text-sm font-medium transition-colors rounded-lg mx-2',
                 isActive
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                  ? 'bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-foreground'
+                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100'
               )}
             >
               {item.title}
@@ -389,10 +416,10 @@ function MeetingNavigation() {
 
   return (
     <>
-      <div className="px-3 py-2 border-b border-gray-200">
+      <div className="px-3 py-2 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-2">
-          <Video className="h-5 w-5 text-gray-600" />
-          <h2 className="text-sm font-semibold text-gray-700">Meetings</h2>
+          <Video className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-200">Meetings</h2>
         </div>
       </div>
 
@@ -407,8 +434,8 @@ function MeetingNavigation() {
               className={cn(
                 'block px-4 py-2 text-sm font-medium transition-colors rounded-lg mx-2',
                 isActive
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                  ? 'bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-foreground'
+                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100'
               )}
             >
               {item.title}
@@ -435,7 +462,7 @@ export function AppSidebar() {
 
   return (
     <aside className={cn(
-      "fixed left-0 top-0 z-40 h-screen border-r border-gray-200 bg-white transition-all duration-300",
+      "fixed left-0 top-0 z-40 h-screen border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 transition-all duration-300",
       // Desktop widths
       isSidebarCollapsed ? "lg:w-20" : "lg:w-64",
       // Mobile handling
@@ -443,23 +470,23 @@ export function AppSidebar() {
     )}>
       <div className="flex h-full flex-col">
         {/* Logo */}
-        <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200">
+        <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200 dark:border-gray-700">
           {!isSidebarCollapsed && (
             <Link href="/dashboard" className="flex items-center space-x-2">
-              <span className="text-lg font-bold text-dark">McFin Docs</span>
+              <span className="text-lg font-bold text-dark dark:text-white">McFin Docs</span>
             </Link>
           )}
           <button
             onClick={toggleSidebarCollapse}
             className={cn(
-              "flex h-8 w-8 items-center justify-center rounded-md hover:bg-gray-100 transition-colors",
+              "flex h-8 w-8 items-center justify-center rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors",
               isSidebarCollapsed && "mx-auto"
             )}
           >
             {isSidebarCollapsed ? (
-              <ChevronRight className="h-4 w-4 text-gray-600" />
+              <ChevronRight className="h-4 w-4 text-gray-600 dark:text-gray-400" />
             ) : (
-              <svg className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-4 w-4 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             )}

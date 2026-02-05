@@ -26,27 +26,27 @@ function ArchiveMemoItem({ memo, onClick }: { memo: Memo, onClick: () => void })
 
     return (
         <div
-            className="flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-lg hover:border-gray-400 hover:shadow-md cursor-pointer transition-all duration-200 group relative opacity-80 hover:opacity-100"
+            className="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-gray-400 dark:hover:border-gray-500 hover:shadow-md cursor-pointer transition-all duration-200 group relative opacity-80 hover:opacity-100"
             onClick={onClick}
         >
-            <div className="flex items-center justify-center h-10 w-10 rounded-full bg-gray-100 text-gray-400 font-bold text-xs shrink-0">
+            <div className="flex items-center justify-center h-10 w-10 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 font-bold text-xs shrink-0">
                 {getInitials(memo.from || 'User')}
             </div>
             <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-semibold text-gray-900 truncate">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
                         {memo.subject}
                     </p>
-                    <span className="text-[10px] text-gray-400 font-medium whitespace-nowrap uppercase">
+                    <span className="text-[10px] text-gray-400 dark:text-gray-500 font-medium whitespace-nowrap uppercase">
                         {memo.date}
                     </span>
                 </div>
-                <p className="text-xs text-gray-500 truncate mt-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-1">
                     From: {memo.from}
                 </p>
             </div>
             <div className="flex items-center gap-3 shrink-0">
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-gray-200 bg-gray-50 text-gray-400 uppercase tracking-wider">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                     Archived
                 </span>
             </div>
@@ -101,7 +101,7 @@ export function MemoArchive() {
     const totalItems = filteredMemos.length;
 
     if (loading) {
-        return <div className="p-8 text-center text-gray-500">Loading archive...</div>;
+        return <div className="p-8 text-center text-gray-500 dark:text-gray-400">Loading archive...</div>;
     }
 
     return (
@@ -112,11 +112,11 @@ export function MemoArchive() {
                     variant="ghost"
                     size="icon"
                     onClick={() => router.push('/dashboard')}
-                    className="h-8 w-8"
+                    className="h-8 w-8 dark:hover:bg-gray-800"
                 >
-                    <ArrowLeft className="h-4 w-4 text-gray-900" />
+                    <ArrowLeft className="h-4 w-4 text-gray-900 dark:text-white" />
                 </Button>
-                <h1 className="text-2xl font-bold text-foreground">Memo Archive</h1>
+                <h1 className="text-2xl font-bold text-foreground dark:text-white">Memo Archive</h1>
             </div>
 
             {/* Create Memo Button */}
@@ -133,10 +133,10 @@ export function MemoArchive() {
             <div className="flex gap-2">
                 <div className="relative flex-1 max-w-xs">
                     <Input
-                        placeholder="Search"
+                        placeholder="Search..."
                         value={searchQuery}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-                        className="pr-10 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400"
+                        className="pr-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                     />
                 </div>
                 <Button
@@ -149,7 +149,7 @@ export function MemoArchive() {
 
             {/* List */}
             {filteredMemos.length === 0 ? (
-                <div className="bg-white border border-gray-200 rounded-lg p-12 shadow-sm text-center text-gray-500">
+                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-12 shadow-sm text-center text-gray-500 dark:text-gray-400">
                     No archived memos found
                 </div>
             ) : (
@@ -165,15 +165,15 @@ export function MemoArchive() {
             )}
 
             {/* Pagination */}
-            <div className="flex items-center justify-end gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center justify-end gap-4 text-sm text-muted-foreground dark:text-gray-400">
                 <span>
                     {startItem}-{endItem} of {totalItems}
                 </span>
                 <div className="flex gap-1">
-                    <Button variant="ghost" size="icon" className="h-8 w-8" disabled={currentPage === 1}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 dark:hover:bg-gray-800" disabled={currentPage === 1}>
                         <ChevronLeft className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8" disabled={currentPage === totalPages}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 dark:hover:bg-gray-800" disabled={currentPage === totalPages}>
                         <ChevronRight className="h-4 w-4" />
                     </Button>
                 </div>

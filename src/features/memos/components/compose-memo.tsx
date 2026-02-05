@@ -22,7 +22,7 @@ import dynamic from 'next/dynamic';
 // Dynamically import ReactQuill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill-new'), {
     ssr: false,
-    loading: () => <div className="h-[300px] w-full bg-gray-50 animate-pulse rounded-md" />
+    loading: () => <div className="h-[300px] w-full bg-gray-50 dark:bg-gray-800 animate-pulse rounded-md" />
 });
 import 'react-quill-new/dist/quill.snow.css';
 
@@ -273,7 +273,7 @@ export function ComposeMemo() {
         }
     };
 
-    if (loading) return <div className="p-8 text-center text-gray-500">Loading draft...</div>;
+    if (loading) return <div className="p-8 text-center text-gray-500 dark:text-gray-400">Loading draft...</div>;
 
     return (
         <div className="space-y-6">
@@ -283,67 +283,67 @@ export function ComposeMemo() {
                     variant="ghost"
                     size="icon"
                     onClick={() => router.push('/dashboard')}
-                    className="h-8 w-8 shrink-0"
+                    className="h-8 w-8 shrink-0 dark:hover:bg-gray-800"
                 >
-                    <ArrowLeft className="h-4 w-4" />
+                    <ArrowLeft className="h-4 w-4 dark:text-gray-400" />
                 </Button>
                 <div>
-                    <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">Compose Memo</h1>
+                    <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate dark:text-white">Compose Memo</h1>
                 </div>
             </div>
 
             {/* Branding Header */}
-            <div className="flex flex-col items-center space-y-3 sm:space-y-4 py-6 sm:py-8 bg-white border border-gray-200 rounded-lg shadow-sm">
-                <div className="h-16 w-16 sm:h-20 sm:w-20 border-2 border-primary/20 rounded-lg flex items-center justify-center bg-gray-50 overflow-hidden">
-                    <span className="text-[8px] sm:text-[10px] text-gray-400 font-bold text-center">UNIMED<br />LOGO</span>
+            <div className="flex flex-col items-center space-y-3 sm:space-y-4 py-6 sm:py-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
+                <div className="h-16 w-16 sm:h-20 sm:w-20 border-2 border-primary/20 rounded-lg flex items-center justify-center bg-gray-50 dark:bg-gray-900 overflow-hidden">
+                    <span className="text-[8px] sm:text-[10px] text-gray-400 dark:text-gray-500 font-bold text-center">UNIMED<br />LOGO</span>
                 </div>
-                <div className="bg-[#004a99] text-white px-6 sm:px-8 py-1.5 sm:py-2 rounded-xl text-base sm:text-lg font-bold tracking-wider shadow-sm uppercase">
+                <div className="bg-[#004a99] dark:bg-blue-600 text-white px-6 sm:px-8 py-1.5 sm:py-2 rounded-xl text-base sm:text-lg font-bold tracking-wider shadow-sm uppercase">
                     Internal Memorandum
                 </div>
             </div>
 
-            <Card className="p-4 sm:p-6 bg-white shadow-sm border border-gray-200">
+            <Card className="p-4 sm:p-6 bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700">
                 <form className="space-y-6">
                     {/* From Section */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="from" className="text-gray-900">From</Label>
+                            <Label htmlFor="from" className="text-gray-900 dark:text-gray-200">From</Label>
                             <Input
                                 id="from"
                                 value={currentUser?.email || ''}
                                 disabled
-                                className="bg-white border-gray-200 disabled:opacity-100 disabled:cursor-default text-gray-900"
+                                className="bg-white border-gray-200 dark:bg-gray-900 dark:border-gray-700 disabled:opacity-100 disabled:cursor-default text-gray-900 dark:text-gray-100"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="dept" className="text-gray-900">Department</Label>
+                            <Label htmlFor="dept" className="text-gray-900 dark:text-gray-200">Department</Label>
                             <Input
                                 id="dept"
                                 value={currentUser?.department || ''}
                                 disabled
-                                className="bg-white border-gray-200 disabled:opacity-100 disabled:cursor-default text-gray-900"
+                                className="bg-white border-gray-200 dark:bg-gray-900 dark:border-gray-700 disabled:opacity-100 disabled:cursor-default text-gray-900 dark:text-gray-100"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="designation" className="text-gray-900">Designation</Label>
+                            <Label htmlFor="designation" className="text-gray-900 dark:text-gray-200">Designation</Label>
                             <Input
                                 id="designation"
                                 value={currentUser?.designation || ''}
                                 disabled
-                                className="bg-white border-gray-200 disabled:opacity-100 disabled:cursor-default text-gray-900"
+                                className="bg-white border-gray-200 dark:bg-gray-900 dark:border-gray-700 disabled:opacity-100 disabled:cursor-default text-gray-900 dark:text-gray-100"
                             />
                         </div>
                     </div>
 
                     {/* Financial Approval Toggle */}
-                    <div className="flex items-center justify-between p-4 bg-primary/5 rounded-lg border border-primary/10">
+                    <div className="flex items-center justify-between p-4 bg-primary/5 dark:bg-primary/10 rounded-lg border border-primary/10 dark:border-primary/20">
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-primary/10 rounded-full">
+                            <div className="p-2 bg-primary/10 dark:bg-primary/20 rounded-full">
                                 <CreditCard className="h-5 w-5 text-primary" />
                             </div>
                             <div>
-                                <p className="text-sm font-medium text-gray-900">Financial Approval</p>
-                                <p className="text-xs text-gray-500">Enable this if the memo requires financial authorization</p>
+                                <p className="text-sm font-medium text-gray-900 dark:text-gray-200">Financial Approval</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">Enable this if the memo requires financial authorization</p>
                             </div>
                         </div>
                         <Switch
@@ -356,14 +356,14 @@ export function ComposeMemo() {
                     <div className="space-y-4">
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                                <Label htmlFor="to" className="text-gray-900 font-semibold">To (Actionable Recipients)</Label>
+                                <Label htmlFor="to" className="text-gray-900 dark:text-gray-200 font-semibold">To (Actionable Recipients)</Label>
                                 <div className="flex items-center gap-3">
                                     <Button
                                         type="button"
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => setShowCc(!showCc)}
-                                        className={cn("text-xs transition-colors", showCc ? "text-primary" : "text-gray-500")}
+                                        className={cn("text-xs transition-colors dark:hover:bg-gray-700", showCc ? "text-primary" : "text-gray-500 dark:text-gray-400")}
                                     >
                                         Cc
                                     </Button>
@@ -372,7 +372,7 @@ export function ComposeMemo() {
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => setShowBcc(!showBcc)}
-                                        className={cn("text-xs transition-colors", showBcc ? "text-primary" : "text-gray-500")}
+                                        className={cn("text-xs transition-colors dark:hover:bg-gray-700", showBcc ? "text-primary" : "text-gray-500 dark:text-gray-400")}
                                     >
                                         Bcc
                                     </Button>
@@ -381,7 +381,7 @@ export function ComposeMemo() {
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => setShowReplyTo(!showReplyTo)}
-                                        className={cn("text-xs transition-colors", showReplyTo ? "text-primary" : "text-gray-500")}
+                                        className={cn("text-xs transition-colors dark:hover:bg-gray-700", showReplyTo ? "text-primary" : "text-gray-500 dark:text-gray-400")}
                                     >
                                         Reply-To
                                     </Button>
@@ -396,17 +396,17 @@ export function ComposeMemo() {
                                             }
                                         }}
                                     >
-                                        <SelectTrigger className="bg-white border-gray-200 text-gray-900">
+                                        <SelectTrigger className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100">
                                             <SelectValue placeholder="Search or select recipient..." />
                                         </SelectTrigger>
-                                        <SelectContent>
+                                        <SelectContent className="dark:bg-gray-900 dark:border-gray-700">
                                             <SelectGroup>
-                                                <SelectLabel>Available Staff</SelectLabel>
+                                                <SelectLabel className="dark:text-gray-400">Available Staff</SelectLabel>
                                                 {allUsers.map((user) => (
-                                                    <SelectItem key={user._id} value={user.email}>
+                                                    <SelectItem key={user._id} value={user.email} className="dark:hover:bg-gray-800">
                                                         <div className="flex flex-col">
-                                                            <span className="font-medium">{user.name}</span>
-                                                            <span className="text-[10px] text-gray-500 uppercase">{user.designation} - {user.department}</span>
+                                                            <span className="font-medium dark:text-gray-200">{user.name}</span>
+                                                            <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase">{user.designation} - {user.department}</span>
                                                         </div>
                                                     </SelectItem>
                                                 ))}
@@ -426,13 +426,13 @@ export function ComposeMemo() {
                                                 addRecipient('to');
                                             }
                                         }}
-                                        className="bg-white border-gray-200 text-gray-900"
+                                        className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100"
                                     />
                                     <Button
                                         type="button"
                                         onClick={() => addRecipient('to')}
                                         variant="secondary"
-                                        className="shrink-0"
+                                        className="shrink-0 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                                     >
                                         Add
                                     </Button>
@@ -443,13 +443,13 @@ export function ComposeMemo() {
                                     {formData.to.map((email) => (
                                         <div
                                             key={email}
-                                            className="flex items-center gap-1 bg-primary/10 text-primary border border-primary/20 px-2 py-1 rounded-full text-xs font-medium"
+                                            className="flex items-center gap-1 bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-foreground border border-primary/20 dark:border-primary/30 px-2 py-1 rounded-full text-xs font-medium"
                                         >
                                             {email}
                                             <button
                                                 type="button"
                                                 onClick={() => removeRecipient('to', email)}
-                                                className="ml-1 hover:bg-primary/20 rounded-full p-0.5"
+                                                className="ml-1 hover:bg-primary/20 dark:hover:bg-primary/30 rounded-full p-0.5"
                                             >
                                                 <X className="h-3 w-3" />
                                             </button>
@@ -462,7 +462,7 @@ export function ComposeMemo() {
                         {/* Cc */}
                         {showCc && (
                             <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
-                                <Label htmlFor="cc" className="text-gray-900 font-semibold">Cc (Informational)</Label>
+                                <Label htmlFor="cc" className="text-gray-900 dark:text-gray-200 font-semibold">Cc (Informational)</Label>
                                 <div className="flex gap-2">
                                     <div className="flex-1 relative">
                                         <Select
@@ -472,14 +472,14 @@ export function ComposeMemo() {
                                                 }
                                             }}
                                         >
-                                            <SelectTrigger className="bg-white border-gray-200 text-gray-900">
+                                            <SelectTrigger className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100">
                                                 <SelectValue placeholder="Add from staff list..." />
                                             </SelectTrigger>
-                                            <SelectContent>
+                                            <SelectContent className="dark:bg-gray-900 dark:border-gray-700">
                                                 <SelectGroup>
-                                                    <SelectLabel>Staff</SelectLabel>
+                                                    <SelectLabel className="dark:text-gray-400">Staff</SelectLabel>
                                                     {allUsers.map((user) => (
-                                                        <SelectItem key={user._id} value={user.email}>
+                                                        <SelectItem key={user._id} value={user.email} className="dark:hover:bg-gray-800 dark:text-gray-200">
                                                             {user.name} ({user.email})
                                                         </SelectItem>
                                                     ))}
@@ -499,13 +499,13 @@ export function ComposeMemo() {
                                                     addRecipient('cc');
                                                 }
                                             }}
-                                            className="bg-white border-gray-200 text-gray-900"
+                                            className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100"
                                         />
                                         <Button
                                             type="button"
                                             onClick={() => addRecipient('cc')}
                                             variant="secondary"
-                                            className="shrink-0"
+                                            className="shrink-0 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                                         >
                                             Add
                                         </Button>
@@ -516,13 +516,13 @@ export function ComposeMemo() {
                                         {formData.cc.map((email) => (
                                             <div
                                                 key={email}
-                                                className="flex items-center gap-1 bg-gray-100 text-gray-700 border border-gray-200 px-2 py-1 rounded-full text-xs font-medium"
+                                                className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 px-2 py-1 rounded-full text-xs font-medium"
                                             >
                                                 {email}
                                                 <button
                                                     type="button"
                                                     onClick={() => removeRecipient('cc', email)}
-                                                    className="ml-1 hover:bg-gray-200 rounded-full p-0.5"
+                                                    className="ml-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full p-0.5"
                                                 >
                                                     <X className="h-3 w-3" />
                                                 </button>
@@ -536,7 +536,7 @@ export function ComposeMemo() {
                         {/* Bcc */}
                         {showBcc && (
                             <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
-                                <Label htmlFor="bcc" className="text-gray-900 font-semibold">Bcc (Discreet awareness)</Label>
+                                <Label htmlFor="bcc" className="text-gray-900 dark:text-gray-200 font-semibold">Bcc (Discreet awareness)</Label>
                                 <div className="flex gap-2">
                                     <div className="flex-1 relative">
                                         <Select
@@ -546,14 +546,14 @@ export function ComposeMemo() {
                                                 }
                                             }}
                                         >
-                                            <SelectTrigger className="bg-white border-gray-200 text-gray-900">
+                                            <SelectTrigger className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100">
                                                 <SelectValue placeholder="Add from staff list..." />
                                             </SelectTrigger>
-                                            <SelectContent>
+                                            <SelectContent className="dark:bg-gray-900 dark:border-gray-700">
                                                 <SelectGroup>
-                                                    <SelectLabel>Staff</SelectLabel>
+                                                    <SelectLabel className="dark:text-gray-400">Staff</SelectLabel>
                                                     {allUsers.map((user) => (
-                                                        <SelectItem key={user._id} value={user.email}>
+                                                        <SelectItem key={user._id} value={user.email} className="dark:hover:bg-gray-800 dark:text-gray-200">
                                                             {user.name} ({user.email})
                                                         </SelectItem>
                                                     ))}
@@ -573,13 +573,13 @@ export function ComposeMemo() {
                                                     addRecipient('bcc');
                                                 }
                                             }}
-                                            className="bg-white border-gray-200 text-gray-900"
+                                            className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100"
                                         />
                                         <Button
                                             type="button"
                                             onClick={() => addRecipient('bcc')}
                                             variant="secondary"
-                                            className="shrink-0"
+                                            className="shrink-0 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                                         >
                                             Add
                                         </Button>
@@ -590,13 +590,13 @@ export function ComposeMemo() {
                                         {formData.bcc.map((email) => (
                                             <div
                                                 key={email}
-                                                className="flex items-center gap-1 bg-gray-100 text-gray-700 border border-gray-200 px-2 py-1 rounded-full text-xs font-medium"
+                                                className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 px-2 py-1 rounded-full text-xs font-medium"
                                             >
                                                 {email}
                                                 <button
                                                     type="button"
                                                     onClick={() => removeRecipient('bcc', email)}
-                                                    className="ml-1 hover:bg-gray-200 rounded-full p-0.5"
+                                                    className="ml-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full p-0.5"
                                                 >
                                                     <X className="h-3 w-3" />
                                                 </button>
@@ -610,14 +610,14 @@ export function ComposeMemo() {
                         {/* Reply-To */}
                         {showReplyTo && (
                             <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
-                                <Label htmlFor="replyTo" className="text-gray-900 font-semibold text-xs">Reply-To (Where replies should go)</Label>
+                                <Label htmlFor="replyTo" className="text-gray-900 dark:text-gray-200 font-semibold text-xs">Reply-To (Where replies should go)</Label>
                                 <div className="flex gap-2">
                                     <Input
                                         id="replyTo"
                                         placeholder="Specific email for replies (optional)..."
                                         value={formData.replyTo}
                                         onChange={(e) => setFormData({ ...formData, replyTo: e.target.value })}
-                                        className="bg-white border-gray-200 text-gray-900"
+                                        className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                                     />
                                 </div>
                             </div>
@@ -626,7 +626,7 @@ export function ComposeMemo() {
 
                     {/* Subject */}
                     <div className="space-y-2">
-                        <Label htmlFor="subject" className="text-gray-900">Subject</Label>
+                        <Label htmlFor="subject" className="text-gray-900 dark:text-gray-200">Subject</Label>
                         <Input
                             id="subject"
                             placeholder="Enter subject..."
@@ -634,7 +634,7 @@ export function ComposeMemo() {
                             onChange={(e) =>
                                 setFormData({ ...formData, subject: e.target.value })
                             }
-                            className="bg-white border-gray-200 text-gray-900 placeholder:text-gray-400"
+                            className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                         />
                     </div>
 
@@ -667,7 +667,7 @@ export function ComposeMemo() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Recommender */}
                         <div className="space-y-2">
-                            <Label htmlFor="recommender" className="text-gray-900 font-semibold">Recommenders</Label>
+                            <Label htmlFor="recommender" className="text-gray-900 dark:text-gray-200 font-semibold">Recommenders</Label>
                             <div className="flex gap-2">
                                 <div className="flex-1 relative">
                                     <Select
@@ -677,12 +677,12 @@ export function ComposeMemo() {
                                             }
                                         }}
                                     >
-                                        <SelectTrigger className="bg-white border-gray-200">
+                                        <SelectTrigger className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100">
                                             <SelectValue placeholder="Select high-level staff..." />
                                         </SelectTrigger>
-                                        <SelectContent>
+                                        <SelectContent className="dark:bg-gray-900 dark:border-gray-700">
                                             {allUsers.map((user) => (
-                                                <SelectItem key={user._id} value={user.email}>{user.name} ({user.designation})</SelectItem>
+                                                <SelectItem key={user._id} value={user.email} className="dark:hover:bg-gray-800 dark:text-gray-200">{user.name} ({user.designation})</SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
@@ -699,13 +699,13 @@ export function ComposeMemo() {
                                                 addRecipient('recommender');
                                             }
                                         }}
-                                        className="bg-white border-gray-200 text-gray-900"
+                                        className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                                     />
                                     <Button
                                         type="button"
                                         onClick={() => addRecipient('recommender')}
                                         variant="secondary"
-                                        className="shrink-0"
+                                        className="shrink-0 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                                     >
                                         Add
                                     </Button>
@@ -716,13 +716,13 @@ export function ComposeMemo() {
                                     {formData.recommender.map((email) => (
                                         <div
                                             key={email}
-                                            className="flex items-center gap-1 bg-blue-50 text-blue-700 border border-blue-100 px-2 py-1 rounded-full text-xs font-medium"
+                                            className="flex items-center gap-1 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-800 px-2 py-1 rounded-full text-xs font-medium"
                                         >
                                             {email}
                                             <button
                                                 type="button"
                                                 onClick={() => removeRecipient('recommender', email)}
-                                                className="ml-1 hover:bg-blue-100 rounded-full p-0.5"
+                                                className="ml-1 hover:bg-blue-100 dark:hover:bg-blue-800 rounded-full p-0.5"
                                             >
                                                 <X className="h-3 w-3" />
                                             </button>
@@ -734,7 +734,7 @@ export function ComposeMemo() {
 
                         {/* Approver */}
                         <div className="space-y-2">
-                            <Label htmlFor="approver" className="text-gray-900 font-semibold">Approvers</Label>
+                            <Label htmlFor="approver" className="text-gray-900 dark:text-gray-200 font-semibold">Approvers</Label>
                             <div className="flex gap-2">
                                 <div className="flex-1 relative">
                                     <Select
@@ -744,12 +744,12 @@ export function ComposeMemo() {
                                             }
                                         }}
                                     >
-                                        <SelectTrigger className="bg-white border-gray-200">
+                                        <SelectTrigger className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100">
                                             <SelectValue placeholder="Select approver (e.g. Registrar, VC)..." />
                                         </SelectTrigger>
-                                        <SelectContent>
+                                        <SelectContent className="dark:bg-gray-900 dark:border-gray-700">
                                             {allUsers.map((user) => (
-                                                <SelectItem key={user._id} value={user.email}>{user.name} ({user.designation})</SelectItem>
+                                                <SelectItem key={user._id} value={user.email} className="dark:hover:bg-gray-800 dark:text-gray-200">{user.name} ({user.designation})</SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
@@ -766,13 +766,13 @@ export function ComposeMemo() {
                                                 addRecipient('approver');
                                             }
                                         }}
-                                        className="bg-white border-gray-200 text-gray-900"
+                                        className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                                     />
                                     <Button
                                         type="button"
                                         onClick={() => addRecipient('approver')}
                                         variant="secondary"
-                                        className="shrink-0"
+                                        className="shrink-0 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                                     >
                                         Add
                                     </Button>
@@ -783,13 +783,13 @@ export function ComposeMemo() {
                                     {formData.approver.map((email) => (
                                         <div
                                             key={email}
-                                            className="flex items-center gap-1 bg-green-50 text-green-700 border border-green-100 px-2 py-1 rounded-full text-xs font-medium"
+                                            className="flex items-center gap-1 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 border border-green-100 dark:border-green-800 px-2 py-1 rounded-full text-xs font-medium"
                                         >
                                             {email}
                                             <button
                                                 type="button"
                                                 onClick={() => removeRecipient('approver', email)}
-                                                className="ml-1 hover:bg-green-100 rounded-full p-0.5"
+                                                className="ml-1 hover:bg-green-100 dark:hover:bg-green-800 rounded-full p-0.5"
                                             >
                                                 <X className="h-3 w-3" />
                                             </button>
@@ -802,8 +802,8 @@ export function ComposeMemo() {
 
                     {/* Message */}
                     <div className="space-y-4">
-                        <Label htmlFor="message" className="text-gray-900 font-semibold text-base sm:text-lg">Message</Label>
-                        <div className="prose-none min-h-[300px] sm:min-h-[400px] border border-gray-200 rounded-lg overflow-hidden bg-white focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+                        <Label htmlFor="message" className="text-gray-900 dark:text-gray-200 font-semibold text-base sm:text-lg">Message</Label>
+                        <div className="prose-none min-h-[300px] sm:min-h-[400px] border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-900 focus-within:ring-2 focus-within:ring-primary/20 transition-all">
                             <ReactQuill
                                 theme="snow"
                                 value={formData.message}
@@ -818,7 +818,7 @@ export function ComposeMemo() {
                                         ['clean']
                                     ],
                                 }}
-                                className="h-[350px] border-none"
+                                className="h-[350px] border-none dark:text-gray-200"
                             />
                         </div>
                         <style jsx global>{`
@@ -827,6 +827,10 @@ export function ComposeMemo() {
                                 border-bottom: 1px solid #e5e7eb !important;
                                 background-color: #f9fafb;
                                 padding: 8px 12px !important;
+                            }
+                            .dark .ql-toolbar.ql-snow {
+                                border-bottom: 1px solid #374151 !important;
+                                background-color: #1f2937;
                             }
                             .ql-container.ql-snow {
                                 border: none !important;
@@ -842,21 +846,37 @@ export function ComposeMemo() {
                                 color: #9ca3af !important;
                                 left: 20px !important;
                             }
+                            .dark .ql-editor.ql-blank::before {
+                                color: #6b7280 !important;
+                            }
                             .ql-snow .ql-stroke {
                                 stroke: #4b5563 !important;
+                            }
+                            .dark .ql-snow .ql-stroke {
+                                stroke: #d1d5db !important;
                             }
                             .ql-snow .ql-fill {
                                 fill: #4b5563 !important;
                             }
+                            .dark .ql-snow .ql-fill {
+                                fill: #d1d5db !important;
+                            }
                             .ql-snow .ql-picker {
                                 color: #4b5563 !important;
+                            }
+                            .dark .ql-snow .ql-picker {
+                                color: #d1d5db !important;
+                            }
+                            .dark .ql-picker-options {
+                                background-color: #111827 !important;
+                                border-color: #374151 !important;
                             }
                         `}</style>
                     </div>
 
                     {/* Attachments Section */}
                     <div className="space-y-4">
-                        <Label className="text-gray-900">Attachments</Label>
+                        <Label className="text-gray-900 dark:text-gray-200">Attachments</Label>
                         <div className="flex flex-col gap-4">
                             <div className="relative">
                                 <Input
@@ -867,7 +887,7 @@ export function ComposeMemo() {
                                 />
                                 <Label
                                     htmlFor="file-upload"
-                                    className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-gray-200 rounded-lg cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all text-gray-500"
+                                    className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:border-primary/50 dark:hover:border-primary/50 hover:bg-primary/5 dark:hover:bg-primary/10 transition-all text-gray-500 dark:text-gray-400"
                                 >
                                     <Paperclip className="h-4 w-4" />
                                     <span>Click to attach files or drag and drop</span>
@@ -877,19 +897,19 @@ export function ComposeMemo() {
                             {formData.attachments.length > 0 && (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                     {formData.attachments.map((file, index) => (
-                                        <div key={index} className="flex items-center justify-between p-2 bg-gray-50 border border-gray-200 rounded-lg group">
+                                        <div key={index} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg group">
                                             <div className="flex items-center gap-2 truncate">
-                                                <Paperclip className="h-4 w-4 text-gray-400 shrink-0" />
-                                                <span className="text-sm text-gray-600 truncate">{file.name}</span>
+                                                <Paperclip className="h-4 w-4 text-gray-400 dark:text-gray-500 shrink-0" />
+                                                <span className="text-sm text-gray-600 dark:text-gray-300 truncate">{file.name}</span>
                                             </div>
                                             <Button
                                                 type="button"
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => removeAttachment(index)}
-                                                className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                className="h-7 w-7 opacity-0 group-hover:opacity-100 dark:hover:bg-gray-800 transition-opacity"
                                             >
-                                                <X className="h-3 w-3" />
+                                                <X className="h-3 w-3 dark:text-gray-400" />
                                             </Button>
                                         </div>
                                     ))}
@@ -899,12 +919,12 @@ export function ComposeMemo() {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-3 justify-end pt-4 border-t">
+                    <div className="flex flex-col sm:flex-row gap-3 justify-end pt-4 border-t dark:border-gray-700">
                         <Button
                             type="button"
                             variant="outline"
                             onClick={handleSaveDraft}
-                            className="gap-2 w-full sm:w-auto order-2 sm:order-1"
+                            className="gap-2 w-full sm:w-auto order-2 sm:order-1 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
                         >
                             <Save className="h-4 w-4" />
                             Save Draft

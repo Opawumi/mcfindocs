@@ -81,10 +81,10 @@ export function DocumentUploadDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl dark:bg-gray-900 dark:border-gray-800">
         <DialogHeader>
-          <DialogTitle>Upload Document</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="dark:text-white">Upload Document</DialogTitle>
+          <DialogDescription className="dark:text-gray-400">
             Upload a new document to the system with metadata
           </DialogDescription>
         </DialogHeader>
@@ -102,7 +102,7 @@ export function DocumentUploadDialog({
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2">
-                  <Label htmlFor="name">Document Name *</Label>
+                  <Label htmlFor="name" className="dark:text-gray-200">Document Name *</Label>
                   <Input
                     id="name"
                     value={formData.name}
@@ -110,6 +110,7 @@ export function DocumentUploadDialog({
                       setFormData(prev => ({ ...prev, name: e.target.value }))
                     }
                     placeholder="Enter document name"
+                    className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                   />
                 </div>
 
@@ -126,7 +127,7 @@ export function DocumentUploadDialog({
                 />
 
                 <div className="col-span-2">
-                  <Label htmlFor="description">Description *</Label>
+                  <Label htmlFor="description" className="dark:text-gray-200">Description *</Label>
                   <Textarea
                     id="description"
                     value={formData.description}
@@ -135,11 +136,12 @@ export function DocumentUploadDialog({
                     }
                     placeholder="Brief description of the document"
                     rows={3}
+                    className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                   />
                 </div>
 
                 <div className="col-span-2">
-                  <Label htmlFor="tags">Tags</Label>
+                  <Label htmlFor="tags" className="dark:text-gray-200">Tags</Label>
                   <Input
                     id="tags"
                     value={formData.tags}
@@ -147,11 +149,12 @@ export function DocumentUploadDialog({
                       setFormData(prev => ({ ...prev, tags: e.target.value }))
                     }
                     placeholder="Comma-separated tags (e.g., finance, report, 2024)"
+                    className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="department">Department</Label>
+                  <Label htmlFor="department" className="dark:text-gray-200">Department</Label>
                   <Input
                     id="department"
                     value={formData.department}
@@ -159,11 +162,12 @@ export function DocumentUploadDialog({
                       setFormData(prev => ({ ...prev, department: e.target.value }))
                     }
                     placeholder="e.g., HR, Finance"
+                    className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="project">Project</Label>
+                  <Label htmlFor="project" className="dark:text-gray-200">Project</Label>
                   <Input
                     id="project"
                     value={formData.project}
@@ -171,6 +175,7 @@ export function DocumentUploadDialog({
                       setFormData(prev => ({ ...prev, project: e.target.value }))
                     }
                     placeholder="e.g., Q4 2024"
+                    className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                   />
                 </div>
               </div>
@@ -178,13 +183,14 @@ export function DocumentUploadDialog({
           )}
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={handleClose}>
+        <DialogFooter className="dark:border-gray-800">
+          <Button variant="outline" onClick={handleClose} className="dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
             Cancel
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={!file || !formData.name || !formData.parentCategoryId || !formData.description}
+            className="dark:bg-primary dark:text-white"
           >
             Upload Document
           </Button>

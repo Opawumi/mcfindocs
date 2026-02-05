@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FolderTree, CreateFolderDialog, RenameFolderDialog, DeleteFolderDialog } from '@/features/folders';
 import { DocumentGrid } from '@/features/documents';
-import { mockFolderDocuments, mockDocuments } from '@/lib/mock-data';
 import type { Document, Folder } from '@/lib/types';
 import { useUIStore } from '../../../../src/stores';
 import { useFolderContext } from '@/contexts/folder-context';
@@ -17,16 +16,18 @@ import { toast } from 'sonner';
 export default function MyFoldersPage() {
   const router = useRouter();
   const { selectedFolderId, setSelectedFolderId } = useUIStore();
-  const { 
-    folders, 
-    currentFolderId, 
-    setCurrentFolderId, 
-    currentFolder: contextFolder, 
+  const {
+    folders,
+    currentFolderId,
+    setCurrentFolderId,
+    currentFolder: contextFolder,
     setCurrentFolder,
-    refreshFolders 
+    refreshFolders
   } = useFolderContext();
   const [searchQuery, setSearchQuery] = useState('');
-  
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [isLoadingDocuments, setIsLoadingDocuments] = useState(false);
+
   // Dialog states
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
@@ -45,25 +46,42 @@ export default function MyFoldersPage() {
     }
   }, [selectedFolderId, folders, setCurrentFolderId, setCurrentFolder]);
 
-  // Get documents in selected folder
-  const folderDocumentIds = selectedFolderId
-    ? mockFolderDocuments
-        .filter(fd => fd.folderId === selectedFolderId)
-        .map(fd => fd.documentId)
-    : [];
+  // Fetch documents when folder selection changes
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      setIsLoadingDocuments(true);
+      try {
+        const url = selectedFolderId
+          ? `/api/folders/documents?folderId=${selectedFolderId}`
+          : '/api/folders/documents';
 
-  const folderDocuments = selectedFolderId
-    ? mockDocuments.filter(doc => folderDocumentIds.includes(doc.id))
-    : mockDocuments.filter(doc => 
-        mockFolderDocuments.some(fd => fd.documentId === doc.id)
-      );
+        const response = await fetch(url);
+        if (response.ok) {
+          const data = await response.json();
+          // Since we don't have a Document model yet, this will be empty
+          // But the structure is ready for when documents are added
+          setDocuments([]);
+        } else {
+          console.error('Failed to fetch documents');
+          setDocuments([]);
+        }
+      } catch (error) {
+        console.error('Error fetching documents:', error);
+        setDocuments([]);
+      } finally {
+        setIsLoadingDocuments(false);
+      }
+    };
+
+    fetchDocuments();
+  }, [selectedFolderId]);
 
   // Filter by search
   const searchedDocuments = searchQuery
-    ? folderDocuments.filter(doc =>
-        doc.name.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : folderDocuments;
+    ? documents.filter(doc =>
+      doc.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    : documents;
 
   // Get current folder info (use context folder if available, otherwise fallback)
   const displayFolder = contextFolder || (selectedFolderId

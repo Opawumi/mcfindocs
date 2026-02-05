@@ -100,19 +100,19 @@ export function UserManagement() {
                         variant="ghost"
                         size="icon"
                         onClick={() => router.push('/dashboard')}
-                        className="h-8 w-8"
+                        className="h-8 w-8 dark:hover:bg-gray-800"
                     >
-                        <ArrowLeft className="h-4 w-4 text-gray-900" />
+                        <ArrowLeft className="h-4 w-4 text-gray-900 dark:text-white" />
                     </Button>
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
-                        <p className="text-sm text-gray-500">Manage system users and access roles</p>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">User Management</h1>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Manage system users and access roles</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
                     <Button
                         variant="outline"
-                        className="gap-2"
+                        className="gap-2 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
                         onClick={() => router.push('/dashboard/admin/roles')}
                     >
                         <Shield className="h-4 w-4" />
@@ -126,30 +126,30 @@ export function UserManagement() {
             </div>
 
             {/* Filters */}
-            <div className="flex items-center gap-4 bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <div className="flex items-center gap-4 bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
                 <div className="relative flex-1 max-w-sm">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
                     <Input
                         placeholder="Search users..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-9 bg-white border-gray-200"
+                        className="pl-9 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                     />
                 </div>
                 {/* Placeholder for more filters if needed */}
             </div>
 
             {/* Users Table */}
-            <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm overflow-hidden">
                 <Table>
-                    <TableHeader>
-                        <TableRow className="hover:bg-gray-50">
-                            <TableHead className="w-[300px]">User</TableHead>
-                            <TableHead>Role</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Department</TableHead>
-                            <TableHead>Last Active</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
+                    <TableHeader className="bg-gray-50/50 dark:bg-gray-900/50">
+                        <TableRow className="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 border-gray-200 dark:border-gray-700">
+                            <TableHead className="w-[300px] dark:text-gray-300">User</TableHead>
+                            <TableHead className="dark:text-gray-300">Role</TableHead>
+                            <TableHead className="dark:text-gray-300">Status</TableHead>
+                            <TableHead className="dark:text-gray-300">Department</TableHead>
+                            <TableHead className="dark:text-gray-300">Last Active</TableHead>
+                            <TableHead className="text-right dark:text-gray-300">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -159,49 +159,49 @@ export function UserManagement() {
                                     <div className="flex items-center gap-3">
                                         <Avatar className="h-9 w-9">
                                             <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`} />
-                                            <AvatarFallback>{user.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                                            <AvatarFallback className="dark:bg-gray-700 dark:text-gray-300">{user.name.substring(0, 2).toUpperCase()}</AvatarFallback>
                                         </Avatar>
                                         <div className="flex flex-col">
-                                            <span className="font-medium text-gray-900">{user.name}</span>
-                                            <span className="text-sm text-gray-500">{user.email}</span>
+                                            <span className="font-medium text-gray-900 dark:text-white">{user.name}</span>
+                                            <span className="text-sm text-gray-500 dark:text-gray-400">{user.email}</span>
                                         </div>
                                     </div>
                                 </TableCell>
                                 <TableCell>
                                     <div className="flex items-center gap-2">
-                                        <Shield className="h-3 w-3 text-gray-400" />
-                                        <span className="text-gray-700">{user.role}</span>
+                                        <Shield className="h-3 w-3 text-gray-400 dark:text-gray-500" />
+                                        <span className="text-gray-700 dark:text-gray-300">{user.role}</span>
                                     </div>
                                 </TableCell>
                                 <TableCell>
                                     <Badge variant="secondary" className={
-                                        user.status === 'Active' ? 'bg-green-100 text-green-700 hover:bg-green-100' :
-                                            user.status === 'Inactive' ? 'bg-gray-100 text-gray-700 hover:bg-gray-100' :
-                                                'bg-yellow-100 text-yellow-700 hover:bg-yellow-100'
+                                        user.status === 'Active' ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/50' :
+                                            user.status === 'Inactive' ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600' :
+                                                'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-400 hover:bg-yellow-100 dark:hover:bg-yellow-900/50'
                                     }>
                                         {user.status}
                                     </Badge>
                                 </TableCell>
-                                <TableCell className="text-gray-700">{user.department}</TableCell>
-                                <TableCell className="text-gray-500 text-sm">{user.lastActive}</TableCell>
+                                <TableCell className="text-gray-700 dark:text-gray-300">{user.department}</TableCell>
+                                <TableCell className="text-gray-500 dark:text-gray-400 text-sm">{user.lastActive}</TableCell>
                                 <TableCell className="text-right">
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                            <Button variant="ghost" className="h-8 w-8 p-0 dark:hover:bg-gray-700">
                                                 <span className="sr-only">Open menu</span>
-                                                <MoreHorizontal className="h-4 w-4" />
+                                                <MoreHorizontal className="h-4 w-4 dark:text-gray-400" />
                                             </Button>
                                         </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end" className="bg-white border-gray-200">
-                                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                            <DropdownMenuItem className="cursor-pointer">
+                                        <DropdownMenuContent align="end" className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                                            <DropdownMenuLabel className="dark:text-gray-300">Actions</DropdownMenuLabel>
+                                            <DropdownMenuItem className="cursor-pointer dark:hover:bg-gray-700 dark:text-gray-300">
                                                 View Details
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem className="cursor-pointer">
+                                            <DropdownMenuItem className="cursor-pointer dark:hover:bg-gray-700 dark:text-gray-300">
                                                 Edit User
                                             </DropdownMenuItem>
-                                            <DropdownMenuSeparator />
-                                            <DropdownMenuItem className="text-red-600 cursor-pointer">
+                                            <DropdownMenuSeparator className="dark:bg-gray-700" />
+                                            <DropdownMenuItem className="text-red-600 dark:text-red-400 cursor-pointer dark:hover:bg-red-900/20">
                                                 Deactivate User
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>

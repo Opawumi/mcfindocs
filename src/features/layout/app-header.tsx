@@ -37,28 +37,28 @@ export function AppHeader() {
 
   if (!mounted) {
     return (
-      <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-gray-200 bg-white px-4 md:px-6">
+      <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 md:px-6">
         <div className="flex-1 max-w-md hidden md:block">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
             <input
               type="search"
               placeholder="Search..."
-              className="h-10 w-full rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-sm"
+              className="h-10 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 pl-10 pr-4 text-sm"
               disabled
             />
           </div>
         </div>
         <div className="flex-1 md:hidden" />
         <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-full bg-gray-100 animate-pulse" />
+          <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-gray-700 animate-pulse" />
         </div>
       </header>
     );
   }
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-2 md:gap-4 border-b border-gray-200 bg-white px-4 md:px-6">
+    <header className="sticky top-0 z-30 flex h-16 items-center gap-2 md:gap-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 md:px-6 transition-colors duration-300">
       {/* Mobile Menu Toggle */}
       <Button
         variant="default"
@@ -78,11 +78,11 @@ export function AppHeader() {
       {/* Search - Desktop */}
       <div className="flex-1 max-w-md hidden md:block">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
           <input
             type="search"
             placeholder="Search documents, memos..."
-            className="h-10 w-full rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className="h-10 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 pl-10 pr-4 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
           />
         </div>
       </div>
@@ -93,14 +93,14 @@ export function AppHeader() {
       <div className="flex items-center gap-1 md:gap-3">
         {/* Search - Mobile Toggle (Placeholder) */}
         <Button variant="ghost" size="icon" className="md:hidden h-9 w-9">
-          <Search className="h-5 w-5 text-gray-600" />
+          <Search className="h-5 w-5 text-gray-600 dark:text-gray-400" />
         </Button>
 
         {/* Notifications */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-9 w-9 relative hover:bg-gray-100">
-              <Bell className="h-5 w-5 text-gray-600" />
+            <Button variant="ghost" size="icon" className="h-9 w-9 relative hover:bg-gray-100 dark:hover:bg-gray-700">
+              <Bell className="h-5 w-5 text-gray-600 dark:text-gray-400" />
               {unreadNotificationsCount > 0 && (
                 <Badge
                   variant="destructive"
@@ -111,11 +111,11 @@ export function AppHeader() {
               )}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-[calc(100vw-32px)] md:w-80">
-            <DropdownMenuLabel className="font-semibold">Notifications</DropdownMenuLabel>
-            <DropdownMenuSeparator />
+          <DropdownMenuContent align="end" className="w-[calc(100vw-32px)] md:w-80 dark:bg-gray-800 dark:border-gray-700">
+            <DropdownMenuLabel className="font-semibold dark:text-gray-100">Notifications</DropdownMenuLabel>
+            <DropdownMenuSeparator className="dark:bg-gray-700" />
             {notifications.length === 0 ? (
-              <div className="p-4 text-center text-sm text-gray-500">
+              <div className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
                 No notifications
               </div>
             ) : (
@@ -123,15 +123,15 @@ export function AppHeader() {
                 {notifications.slice(0, 5).map((notification) => (
                   <DropdownMenuItem
                     key={notification.id}
-                    className="flex flex-col items-start gap-1 p-3 cursor-pointer"
+                    className="flex flex-col items-start gap-1 p-3 cursor-pointer dark:hover:bg-gray-700"
                   >
                     <div className="flex w-full items-start justify-between gap-2">
-                      <p className="text-sm font-medium text-gray-900">{notification.title}</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{notification.title}</p>
                       {!notification.isRead && (
                         <div className="h-2 w-2 rounded-full bg-primary" />
                       )}
                     </div>
-                    <p className="text-xs text-gray-600 line-clamp-2">
+                    <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
                       {notification.message}
                     </p>
                   </DropdownMenuItem>
@@ -144,7 +144,7 @@ export function AppHeader() {
         {/* User Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-9 gap-2 px-1 md:px-2 hover:bg-gray-100">
+            <Button variant="ghost" className="h-9 gap-2 px-1 md:px-2 hover:bg-gray-100 dark:hover:bg-gray-700">
               <Avatar className="h-7 w-7">
                 <AvatarImage src={(session?.user as any)?.image} alt={session?.user?.name || ''} />
                 <AvatarFallback className="bg-primary text-white text-[10px] font-semibold">
@@ -152,37 +152,37 @@ export function AppHeader() {
                 </AvatarFallback>
               </Avatar>
               <div className="flex flex-col items-start hidden sm:flex">
-                <span className="text-[11px] font-bold text-gray-900 leading-none">
+                <span className="text-[11px] font-bold text-gray-900 dark:text-gray-100 leading-none">
                   {session?.user?.name}
                 </span>
-                <span className="text-[9px] text-gray-500 font-medium">
+                <span className="text-[9px] text-gray-500 dark:text-gray-400 font-medium">
                   {(session?.user as any)?.role || 'User'}
                 </span>
               </div>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuContent align="end" className="w-56 dark:bg-gray-800 dark:border-gray-700">
             <DropdownMenuLabel>
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium text-gray-900">{session?.user?.name}</p>
-                <p className="text-xs text-gray-600">{session?.user?.email}</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{session?.user?.name}</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">{session?.user?.email}</p>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
+            <DropdownMenuSeparator className="dark:bg-gray-700" />
             <DropdownMenuItem asChild>
-              <Link href="/dashboard/profile" className="flex w-full cursor-pointer items-center">
-                <User className="mr-2 h-4 w-4 text-gray-600" />
-                <span className="text-gray-700">Profile</span>
+              <Link href="/dashboard/profile" className="flex w-full cursor-pointer items-center dark:hover:bg-gray-700">
+                <User className="mr-2 h-4 w-4 text-gray-600 dark:text-gray-400" />
+                <span className="text-gray-700 dark:text-gray-200">Profile</span>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href="/dashboard/settings" className="flex w-full cursor-pointer items-center">
-                <Settings className="mr-2 h-4 w-4 text-gray-600" />
-                <span className="text-gray-700">Settings</span>
+              <Link href="/dashboard/settings" className="flex w-full cursor-pointer items-center dark:hover:bg-gray-700">
+                <Settings className="mr-2 h-4 w-4 text-gray-600 dark:text-gray-400" />
+                <span className="text-gray-700 dark:text-gray-200">Settings</span>
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout} className="text-red-600 cursor-pointer">
+            <DropdownMenuSeparator className="dark:bg-gray-700" />
+            <DropdownMenuItem onClick={handleLogout} className="text-red-600 cursor-pointer dark:hover:bg-gray-700">
               <LogOut className="mr-2 h-4 w-4" />
               <span>Logout</span>
             </DropdownMenuItem>
