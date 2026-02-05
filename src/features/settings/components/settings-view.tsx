@@ -465,7 +465,7 @@ export function SettingsView() {
                                                 id="systemTheme"
                                                 checked={theme === 'system'}
                                                 onCheckedChange={(checked) => {
-                                                    setTheme(checked ? 'system' : resolvedTheme);
+                                                    setTheme(checked ? 'system' : (resolvedTheme || 'light'));
                                                     toast.success(checked ? 'Using system theme' : 'Using manual theme');
                                                 }}
                                             />
