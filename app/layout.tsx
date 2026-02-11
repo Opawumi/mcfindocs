@@ -19,7 +19,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet" crossOrigin="anonymous" />
       </head>
-      <body className="antialiased" style={{ fontFamily: 'Figtree, sans-serif' }}>
+      <body className="antialiased" style={{ fontFamily: 'Figtree, sans-serif' }} suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

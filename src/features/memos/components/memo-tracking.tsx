@@ -143,8 +143,60 @@ export function MemoTracking() {
                 </Button>
             </div>
 
-            {/* Table */}
-            <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden shadow-sm">
+            {/* Mobile Card View */}
+            <div className="block md:hidden space-y-4">
+                {filteredMemos.length === 0 ? (
+                    <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-8 text-center text-gray-500 dark:text-gray-400">
+                        <div className="flex flex-col items-center gap-2">
+                            <Search className="h-8 w-8 opacity-20" />
+                            <p className="font-medium">No tracking information available</p>
+                        </div>
+                    </div>
+                ) : (
+                    filteredMemos.map((memo: Memo) => (
+                        <div
+                            key={memo._id}
+                            className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 shadow-sm hover:border-primary/50 transition-colors cursor-pointer"
+                            onClick={() => router.push(`/dashboard/memos/inbox/${memo._id}`)}
+                        >
+                            <div className="flex justify-between items-start mb-2">
+                                <span className="font-mono text-[10px] text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700/50 px-2 py-0.5 rounded">
+                                    {getReferenceNo(memo)}
+                                </span>
+                                <span className={cn(
+                                    "inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase",
+                                    getStatusDisplay(memo.status) === 'Closed'
+                                        ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                                        : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
+                                )}>
+                                    {getStatusDisplay(memo.status)}
+                                </span>
+                            </div>
+
+                            <h3 className="font-semibold text-gray-900 dark:text-gray-200 mb-2 line-clamp-2">
+                                {memo.subject}
+                            </h3>
+
+                            <div className="flex items-end justify-between text-xs mt-3">
+                                <div className="space-y-1">
+                                    <div className="text-gray-500 dark:text-gray-400">
+                                        <span className="font-medium">From:</span> {memo.fromName || memo.from}
+                                    </div>
+                                    <div className="text-gray-500 dark:text-gray-400">
+                                        <span className="font-medium">Date:</span> {memo.createdAt ? new Date(memo.createdAt).toLocaleDateString('en-GB') : memo.date}
+                                    </div>
+                                </div>
+                                <div className="text-[10px] text-gray-400">
+                                    Updated: {memo.updatedAt ? new Date(memo.updatedAt).toLocaleDateString('en-GB') : '-'}
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden shadow-sm">
                 <Table>
                     <TableHeader>
                         <TableRow className="bg-gray-50/50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-700">

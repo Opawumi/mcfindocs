@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Search, Bell, User, Settings, LogOut } from 'lucide-react';
+import { Search, Bell, User, Settings, LogOut, X } from 'lucide-react';
 import { useSession, signOut } from 'next-auth/react';
 import { useUIStore } from '@/stores';
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,7 @@ export function AppHeader() {
   const { data: session } = useSession();
   const { notifications, unreadNotificationsCount, toggleSidebar, setSidebarOpen } = useUIStore();
   const [mounted, setMounted] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -91,8 +92,35 @@ export function AppHeader() {
 
       {/* Right Section */}
       <div className="flex items-center gap-1 md:gap-3">
-        {/* Search - Mobile Toggle (Placeholder) */}
-        <Button variant="ghost" size="icon" className="md:hidden h-9 w-9">
+        {isSearchOpen ? (
+          <div className="absolute inset-0 z-50 flex h-full w-full items-center gap-2 bg-white dark:bg-gray-800 px-4 animate-in fade-in zoom-in-95 duration-200">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+              <input
+                type="search"
+                autoFocus
+                placeholder="Search documents..."
+                className="h-10 w-full rounded-lg bg-gray-100 dark:bg-gray-700 pl-10 pr-4 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsSearchOpen(false)}
+              className="ml-1"
+            >
+              <X className="h-5 w-5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" />
+            </Button>
+          </div>
+        ) : null}
+
+        {/* Search - Mobile Toggle */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden h-9 w-9"
+          onClick={() => setIsSearchOpen(true)}
+        >
           <Search className="h-5 w-5 text-gray-600 dark:text-gray-400" />
         </Button>
 
