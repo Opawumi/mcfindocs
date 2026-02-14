@@ -190,7 +190,7 @@ function CategoryTree() {
           'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
           selectedCategoryId === null
             ? 'bg-primary text-white'
-            : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+            : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300'
         )}
       >
         <span className="flex-1 text-left">All Documents</span>
